@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# VS Code / IDE settings
+.vscode/
+.idea/
+
+# macOS / OS X
+.DS_Store
+
+# You can ignore datasets if they are too large
+# data/
+# *.csv
+
+# ---------------------------------------------------
+# Model Files are INTENTIONALLY left tracked
+# ---------------------------------------------------
+# Your models/ folder and .pkl files are NOT ignored here, 
+# so your friend will be able to clone the repository and 
+# use the trained model immediately!
