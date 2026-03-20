@@ -1,4 +1,4 @@
-# GigIns Guard
+# GigGuard AI
 ### AI-Powered Parametric Insurance Platform for Gig Workers
 
 # 1. Introduction
