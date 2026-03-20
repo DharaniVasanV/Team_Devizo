@@ -1,3 +1,6 @@
+# GigIns Guard
+### AI-Powered Parametric Insurance Platform for Gig Workers
+
 # 1. Introduction
 
 For example, gig economy workers like **delivery partners** need to earn their daily income to support their livelihoods. However, they are more likely to be affected by **environmental disruptions** like **heavy rainfall**, **extreme heat waves**, **bad air quality**, **traffic restrictions**, or any **emergency-like situations**. In such cases, they are unable to work and thus lose their daily earnings.
