@@ -279,8 +279,6 @@ This system also includes a **fraud detection layer** that detects abnormal acti
 - spoofing of GPS locations  
 - bot activity  
 
----
-
 ## Differentiating Genuine Workers vs Bad Actors
 
 To differentiate between genuine workers and bad actors, this platform makes use of an *Isolation Forest anomaly detection model*.
@@ -299,8 +297,6 @@ Spoofing attacks often show:
 - unrealistically high `tasks_completed_per_day`
 - unrealistically low `average_task_time_minutes`
 - unrealistic `device_changes` and `location_changes`
-
----
 
 ## Data Signals Used for Fraud Detection
 
@@ -326,8 +322,6 @@ To avoid GPS spoofing manipulation, the system evaluates **multiple behavioral a
 - unusually high payouts  
 - abnormal cancellation rates  
 - unusually low customer ratings  
-
----
 
 ## Fair Handling of Flagged Claims
 
