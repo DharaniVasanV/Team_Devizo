@@ -52,7 +52,7 @@ const checkDisruptions = async () => {
                     const simulatedDeliveryHours = Math.random() * 24;
 
                     try {
-                        const mlResponse = await axios.post('http://localhost:8000/predict', {
+                        const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, {
                             rainfall: simulatedRain,
                             temperature: simulatedHeat,
                             aqi: simulatedAqi,

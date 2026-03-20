@@ -55,7 +55,7 @@ const calculateRisk = async (req, res) => {
             delivery_hours: Math.random() * 24
         };
 
-        const { data } = await axios.post('http://localhost:8000/predict-risk', envData);
+        const { data } = await axios.post(`${process.env.ML_API_URL}/predict-risk`, envData);
         
         res.json({
             risk_score: data.risk_score,

@@ -15,11 +15,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model and scaler with absolute paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model = joblib.load(os.path.join(BASE_DIR, "anomaly_model.pkl"))
-scaler = joblib.load(os.path.join(BASE_DIR, "scaler.pkl"))
-risk_model = joblib.load(os.path.join(BASE_DIR, "risk_model.pkl"))
+# Load model and scaler with relative paths
+model = joblib.load("anomaly_model.pkl")
+scaler = joblib.load("scaler.pkl")
+risk_model = joblib.load("risk_model.pkl")
 class ClaimData(BaseModel):
     rainfall: float
     temperature: float
