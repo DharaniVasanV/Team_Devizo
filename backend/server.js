@@ -1,15 +1,18 @@
-// Fix for MongoDB DNS Resolution on Windows
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+require('dotenv').config();
+
+// Fix for MongoDB DNS Resolution on Windows (Local only)
+if (process.env.NODE_ENV !== 'production' && !process.env.RENDER) {
+    const dns = require('dns');
+    dns.setDefaultResultOrder('ipv4first');
+    try {
+        dns.setServers(['8.8.8.8', '8.8.4.4']);
+    } catch(e) { /* Ignore */ }
+}
 
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const schedulerService = require('./services/schedulerService');
-
-dotenv.config();
 
 const app = express();
 
