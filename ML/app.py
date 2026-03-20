@@ -20,6 +20,18 @@ model = joblib.load("anomaly_model.pkl")
 scaler = joblib.load("scaler.pkl")
 risk_model = joblib.load("risk_model.pkl")
 class ClaimData(BaseModel):
+    tasks_completed_per_day: float
+    average_task_time_minutes: float
+    distance_travelled_km: float
+    payout_amount: float
+    customer_rating: float
+    login_hours_per_day: float
+    device_changes: int
+    location_changes: int
+    cancellation_rate: float
+    late_delivery_rate: float
+
+class RiskData(BaseModel):
     rainfall: float
     temperature: float
     aqi: float
@@ -28,29 +40,31 @@ class ClaimData(BaseModel):
 @app.post("/predict")
 def predict(data: ClaimData):
     try:
-        # 1. Convert exactly 4 input features to a list and pad with 6 zeros (model expects 10 features)
-        base_features = [data.rainfall, data.temperature, data.aqi, data.delivery_hours]
-        padded_features = base_features + [0.0] * 6
-        input_data = np.array([padded_features])
+        input_data = np.array([[
+            data.tasks_completed_per_day,
+            data.average_task_time_minutes,
+            data.distance_travelled_km,
+            data.payout_amount,
+            data.customer_rating,
+            data.login_hours_per_day,
+            data.device_changes,
+            data.location_changes,
+            data.cancellation_rate,
+            data.late_delivery_rate
+        ]])
         
-        # 2. Apply scaler.transform()
         scaled_data = scaler.transform(input_data)
-        
-        # 3. Pass scaled data into anomaly_model.predict()
         prediction = int(model.predict(scaled_data)[0])
-        
-        # 4. Return prediction
-        status = "normal" if prediction == 1 else "anomaly"
         
         return {
             "prediction": prediction,
-            "status": status
+            "status": "anomaly" if prediction == -1 else "normal"
         }
     except Exception as e:
         return {"error": str(e)}
 
 @app.post("/predict-risk")
-def predict_risk(data: ClaimData):
+def predict_risk(data: RiskData):
     try:
         # Pass 2 features: rainfall and temperature (assuming these are the 2 the risk_model needs)
         input_data = np.array([[data.rainfall, data.temperature]])
