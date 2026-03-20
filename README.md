@@ -249,13 +249,14 @@ The output of this model is:
 - Climate-Based Insurance Premiums  
 - Worker Safety Analysis  
 
----
 
 ## Combined System Workflow
 
 1. The *Anomaly Detection Model* is used to analyze worker activity and determine if fraud is present.
 2. The *Risk Prediction Model* is used to determine disruption risk in the environment.
 3. The dynamic *insurance premiums and claims* are calculated based on this data.
+
+---
 # 8. Simulated Payment System
 
 There exists a *simulated payment gateway* which is used for simulating the actual purchase of insurance.
