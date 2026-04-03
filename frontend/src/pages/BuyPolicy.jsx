@@ -101,26 +101,26 @@ const BuyPolicy = () => {
         <div className="flex bg-[#0b1f3a] min-h-screen text-white font-['Inter',_sans-serif]">
             <Sidebar />
             
-            <main className="flex-1 p-10 overflow-auto">
+            <main className="flex-1 p-6 md:p-10 overflow-x-hidden">
                 <header className="mb-12">
-                    <h1 className="text-4xl font-black mb-2 flex items-center gap-3">
+                    <h1 className="text-3xl md:text-4xl font-black mb-4 flex flex-col md:flex-row items-start md:items-center gap-3">
                         <ShieldCheck className="text-primary" size={40} /> Choose Your Protection
                     </h1>
-                    <p className="text-slate-400 text-lg">Select a weekly plan that fits your working hours and risk level.</p>
+                    <p className="text-slate-400 text-sm md:text-lg">Select a weekly plan that fits your working hours and risk level.</p>
                     
                     {riskData && (
                         <motion.div 
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="mt-8 p-6 rounded-[2rem] bg-indigo-900/40 border border-indigo-500/20 max-w-2xl flex items-center justify-between shadow-2xl backdrop-blur-xl"
+                            className="mt-8 p-6 rounded-[2rem] bg-indigo-900/40 border border-indigo-500/20 w-full lg:max-w-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl backdrop-blur-xl"
                         >
-                            <div>
+                            <div className="w-full md:w-auto">
                                 <h4 className="text-indigo-300 font-bold flex items-center gap-2">
                                     <Activity className="text-indigo-400" size={20} /> AI Risk Assessment
                                 </h4>
                                 <p className="text-sm text-slate-400 mt-1">Real-time parameters dynamically analyzed.</p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-left md:text-right w-full md:w-auto">
                                 <div className="text-xl font-black text-white">Risk Level: <span className={riskData.risk_level === 'high' ? 'text-red-400' : riskData.risk_level === 'medium' ? 'text-yellow-400' : 'text-emerald-400'}>{riskData.risk_level.toUpperCase()}</span></div>
                                 <div className="text-sm text-slate-400 mt-1 font-mono">Score: {riskData.risk_score} | Base Premium: ₹{riskData.recommended_premium}</div>
                             </div>
@@ -134,7 +134,7 @@ const BuyPolicy = () => {
                     </div>
                 )}
 
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {plans.map((plan, idx) => (
                         <motion.div 
                             key={idx}
@@ -177,18 +177,18 @@ const BuyPolicy = () => {
                     ))}
                 </div>
 
-                <div className="mt-12 p-10 glass-morphism rounded-[3rem] border border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div>
-                        <div className="text-slate-500 uppercase tracking-widest text-xs font-black mb-2">Order Summary</div>
-                        <h2 className="text-3xl font-black underline decoration-primary underline-offset-8 decoration-4">{selectedPlan} Plan Purchase</h2>
-                        <p className="mt-4 text-slate-400">Recurring weekly until cancelled. Protection starts instantly.</p>
+                <div className="mt-12 p-8 md:p-10 glass-morphism rounded-[2.5rem] md:rounded-[3rem] border border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="w-full md:w-auto text-center md:text-left">
+                        <div className="text-slate-500 uppercase tracking-widest text-[10px] font-black mb-2">Order Summary</div>
+                        <h2 className="text-2xl md:text-3xl font-black underline decoration-primary underline-offset-8 decoration-4">{selectedPlan} Plan Purchase</h2>
+                        <p className="mt-4 text-slate-400 text-sm">Recurring weekly until cancelled. Protection starts instantly.</p>
                     </div>
-                    <div className="text-right flex flex-col items-center md:items-end w-full md:w-auto">
-                        <div className="text-5xl font-black mb-6">₹{plans.find(p => p.name === selectedPlan)?.premium}.00</div>
+                    <div className="text-center md:text-right flex flex-col items-center md:items-end w-full md:w-auto">
+                        <div className="text-4xl md:text-5xl font-black mb-6">₹{plans.find(p => p.name === selectedPlan)?.premium}.00</div>
                         <button 
                             onClick={handlePurchase}
                             disabled={loading}
-                            className="px-12 py-5 bg-primary rounded-3xl text-xl font-bold hover:scale-105 active:scale-95 transition-all w-full md:w-auto disabled:opacity-50"
+                            className="px-8 md:px-12 py-4 md:py-5 bg-primary rounded-2xl md:rounded-3xl text-lg md:text-xl font-bold hover:scale-105 active:scale-95 transition-all w-full md:w-auto disabled:opacity-50 shadow-xl shadow-primary/20"
                         >
                             {loading ? "Confirming..." : "Confirm & Subscribe"}
                         </button>

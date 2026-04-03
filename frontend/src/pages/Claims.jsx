@@ -45,13 +45,13 @@ const Claims = () => {
         <div className="flex bg-[#0b1f3a] min-h-screen text-white font-['Inter',_sans-serif]">
             <Sidebar />
             
-            <main className="flex-1 p-10 overflow-auto">
-                <header className="mb-12 flex justify-between items-center">
+            <main className="flex-1 p-6 md:p-10 overflow-x-hidden">
+                <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
-                        <h1 className="text-4xl font-black mb-2 flex items-center gap-3">
+                        <h1 className="text-3xl md:text-4xl font-black mb-2 flex items-center gap-3">
                             <BellRing className="text-primary" size={40} /> Claim History
                         </h1>
-                        <p className="text-slate-400 text-lg">Every claim triggered by environmental disruptions.</p>
+                        <p className="text-slate-400 text-sm md:text-lg">Every claim triggered by environmental disruptions.</p>
                     </div>
                 </header>
 
@@ -63,36 +63,36 @@ const Claims = () => {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="p-8 glass-morphism rounded-[2.5rem] border border-white/5 flex flex-col md:flex-row items-center gap-8 group hover:border-primary/20 transition-all"
+                                className="p-6 md:p-8 glass-morphism rounded-[2.5rem] border border-white/5 flex flex-col md:flex-row items-center gap-6 md:gap-8 group hover:border-primary/20 transition-all text-center md:text-left"
                             >
                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 ${
                                     claim.status === 'paid' ? 'bg-green-500/10 text-green-500' : 
                                     claim.status === 'approved' ? 'bg-blue-500/10 text-blue-500' : 'bg-yellow-500/10 text-yellow-500'
-                                }`}>
+                                } shadow-xl shadow-black/20`}>
                                     {claim.status === 'paid' ? <CheckCircle size={32} /> : 
                                      claim.status === 'approved' ? <Zap size={32} /> : <Clock size={32} />}
                                 </div>
 
                                 <div className="flex-1 space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-black">{claim.triggerType} Disruption</span>
+                                    <div className="flex flex-col md:flex-row items-center gap-2">
+                                        <span className="text-xl md:text-2xl font-black tracking-tight">{claim.triggerType} Disruption</span>
                                         <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase text-slate-400 tracking-widest">
                                             {claim.disruptionDetails?.value || 'Active'}
                                         </span>
                                     </div>
-                                    <div className="text-slate-500 flex items-center gap-3 text-sm">
+                                    <div className="text-slate-500 flex flex-col md:flex-row items-center gap-2 md:gap-3 text-sm font-medium">
                                         <span>Triggered {new Date(claim.createdAt).toLocaleString()}</span>
-                                        <span className="w-1.5 h-1.5 bg-slate-700 rounded-full"></span>
-                                        <span>Reference: {claim._id.slice(-8).toUpperCase()}</span>
+                                        <span className="hidden md:block w-1.5 h-1.5 bg-slate-700 rounded-full"></span>
+                                        <span className="text-[10px] uppercase tracking-tighter text-slate-600">Ref: {claim._id.slice(-8).toUpperCase()}</span>
                                     </div>
                                 </div>
 
-                                <div className="text-center md:text-right space-y-3 shrink-0">
-                                    <div className="text-3xl font-black text-white flex items-center justify-center md:justify-end gap-1">
+                                <div className="text-center md:text-right space-y-3 shrink-0 w-full md:w-auto">
+                                    <div className="text-2xl md:text-3xl font-black text-white flex items-center justify-center md:justify-end gap-1">
                                         <IndianRupee size={24} className="text-slate-500" /> {claim.claimAmount}.00
                                     </div>
-                                    <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest inline-block ${
-                                        claim.status === 'paid' ? 'bg-green-500/20 text-green-500 border border-green-500/30' : 
+                                    <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest inline-block ${
+                                        claim.status === 'paid' ? 'bg-green-500/20 text-green-500 border border-green-500/30 shadow-lg shadow-green-500/10' : 
                                         claim.status === 'approved' ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30' : 
                                         'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
                                     }`}>
@@ -101,7 +101,7 @@ const Claims = () => {
                                     {claim.status === 'approved' && (
                                         <button 
                                             onClick={() => handlePayoutFetch(claim._id, claim.claimAmount)}
-                                            className="block w-full md:w-auto mt-4 px-6 py-2 bg-primary rounded-xl text-xs font-bold hover:scale-105 transition-all"
+                                            className="block w-full md:w-auto mt-4 px-8 py-3 bg-blue-600 text-white rounded-xl text-xs font-bold hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-600/20"
                                         >
                                             Withdraw Now <ChevronRight size={14} className="inline ml-1" />
                                         </button>
@@ -110,10 +110,10 @@ const Claims = () => {
                             </motion.div>
                         ))
                     ) : (
-                        <div className="p-32 glass-morphism rounded-[3rem] border border-white/5 flex flex-col items-center justify-center text-center">
+                        <div className="p-16 md:p-32 glass-morphism rounded-[2.5rem] md:rounded-[3rem] border border-white/5 flex flex-col items-center justify-center text-center">
                             <AlertCircle size={64} className="text-slate-700 mb-6" />
                             <h2 className="text-2xl font-black mb-2 italic text-slate-500">No Claims Yet</h2>
-                            <p className="text-slate-600 max-w-sm">When disruptions occur, they will appear here automatically. Stay safe on the road!</p>
+                            <p className="text-slate-600 max-w-sm text-sm">When disruptions occur, they will appear here automatically. Stay safe on the road!</p>
                         </div>
                     )}
                 </div>

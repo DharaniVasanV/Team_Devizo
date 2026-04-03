@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
     LayoutDashboard, 
     ShieldPlus, 
     BellRing, 
-    History, 
     LogOut, 
     Shield,
-    Wallet
+    Wallet,
+    Menu,
+    X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Sidebar = () => {
     const { logout, user } = useAuth();
+    const [isOpen, setIsOpen] = useState(false);
 
     const menuItems = [
         { icon: <LayoutDashboard size={22} />, label: 'Dashboard', path: '/dashboard' },
@@ -21,8 +24,10 @@ const Sidebar = () => {
         { icon: <Wallet size={22} />, label: 'Payouts', path: '/payouts' },
     ];
 
-    return (
-        <aside className="w-80 min-h-screen bg-[#071426] border-r border-white/5 sticky top-0 flex flex-col p-8 font-['Inter',_sans-serif]">
+    const toggleSidebar = () => setIsOpen(!isOpen);
+
+    const SidebarContent = () => (
+        <React.Fragment>
             <div className="flex items-center gap-3 mb-16 px-2">
                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
                     <Shield className="w-6 h-6 text-white" />
@@ -35,6 +40,7 @@ const Sidebar = () => {
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        onClick={() => setIsOpen(false)}
                         className={({ isActive }) => `
                             flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300
                             ${isActive 
@@ -64,8 +70,50 @@ const Sidebar = () => {
                     <span className="font-semibold">Logout</span>
                 </button>
             </div>
-        </aside>
+        </React.Fragment>
+    );
+
+    return (
+        <>
+            {/* Mobile Toggle Button */}
+            <button 
+                onClick={toggleSidebar}
+                className="lg:hidden fixed top-6 right-6 z-[60] bg-blue-600 p-3 rounded-xl shadow-xl shadow-blue-600/20 text-white"
+            >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:flex w-80 min-h-screen bg-[#071426] border-r border-white/5 sticky top-0 flex-col p-8 font-['Inter',_sans-serif]">
+                <SidebarContent />
+            </aside>
+
+            {/* Mobile Sidebar Overlay */}
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsOpen(false)}
+                            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                        />
+                        <motion.aside 
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] bg-[#071426] z-50 p-8 flex flex-col shadow-2xl border-r border-white/5"
+                        >
+                            <SidebarContent />
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     );
 };
 
 export default Sidebar;
+

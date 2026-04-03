@@ -94,33 +94,33 @@ const LandingPage = () => {
                     {/* 4. GLASS/GRADIENT CARD (CENTER ELEMENT) */}
                     <div className="relative premium-card group">
                         <div className="absolute -inset-10 bg-blue-500/20 blur-[100px] rounded-full opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                        <div className="relative bg-gradient-to-br from-blue-400/20 to-blue-700/30 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
-                            <div className="grid md:grid-cols-3 gap-8">
+                        <div className="relative bg-gradient-to-br from-blue-400/20 to-blue-700/30 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-white/20 p-6 md:p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="text-left space-y-2">
                                     <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4 border border-white/10">
                                         <CloudRain className="text-blue-400" />
                                     </div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Monitoring</div>
-                                    <div className="text-2xl font-black italic">Precipitation</div>
-                                    <div className="text-3xl font-bold text-blue-400">55mm / hr</div>
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Active Monitoring</div>
+                                    <div className="text-xl md:text-2xl font-black italic">Precipitation</div>
+                                    <div className="text-2xl md:text-3xl font-bold text-blue-400">55mm / hr</div>
                                 </div>
-                                <div className="text-left space-y-2 border-l border-white/10 pl-8">
+                                <div className="text-left space-y-2 md:border-l border-white/10 md:pl-8">
                                     <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4 border border-white/10">
                                         <Zap className="text-yellow-400" />
                                     </div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest">Payout Engine</div>
-                                    <div className="text-2xl font-black italic">Claim Status</div>
+                                    <div className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Payout Engine</div>
+                                    <div className="text-xl md:text-2xl font-black italic">Claim Status</div>
                                     <div className="text-emerald-400 font-bold flex items-center gap-2">
                                         Approved <CheckCircle size={20} />
                                     </div>
                                 </div>
                                 <div className="bg-white/10 rounded-3xl p-6 border border-white/20 text-left">
-                                    <div className="text-slate-300 text-xs font-bold mb-4 flex justify-between items-center">
+                                    <div className="text-slate-300 text-[10px] font-bold mb-4 flex justify-between items-center">
                                         <span>ESTIMATED PAYOUT</span>
                                         <span className="text-[10px] bg-blue-500 px-2 py-0.5 rounded-full">LIVE</span>
                                     </div>
-                                    <div className="text-4xl font-black mb-1">₹750</div>
-                                    <div className="text-xs text-slate-500">Transferred to account • Just now</div>
+                                    <div className="text-3xl md:text-4xl font-black mb-1">₹750</div>
+                                    <div className="text-[10px] text-slate-500">Transferred to account • Just now</div>
                                 </div>
                             </div>
                         </div>
@@ -129,15 +129,15 @@ const LandingPage = () => {
             </div>
 
             {/* 3. WHITE CONTENT SECTION (CARD AREA) */}
-            <section id="features" className="content-section relative -mt-20 z-10 bg-white text-black rounded-t-[3.5rem] shadow-[0_-40px_100px_-20px_rgba(0,0,0,0.1)] px-6 pt-24 pb-32">
+            <section id="features" className="content-section relative -mt-20 z-10 bg-white text-black rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-40px_100px_-20px_rgba(0,0,0,0.1)] px-6 pt-24 pb-32">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-24 max-w-3xl mx-auto">
-                        <span className="text-blue-600 font-black text-xs uppercase tracking-[0.2em] mb-4 block">Engineered for Reliability</span>
-                        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">Designed for the world's ambitious gig workers.</h2>
-                        <p className="text-xl text-slate-500 leading-relaxed">GigShield handles the complexity of environmental risk so you can focus on your business.</p>
+                    <div className="text-center mb-24 max-w-3xl mx-auto px-4">
+                        <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-4 block">Engineered for Reliability</span>
+                        <h2 className="text-3xl md:text-6xl font-bold tracking-tight mb-6">Designed for the world's ambitious gig workers.</h2>
+                        <p className="text-lg md:text-xl text-slate-500 leading-relaxed">GigShield handles the complexity of environmental risk so you can focus on your business.</p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-12">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                         {[
                             {
                                 icon: <CloudRain className="w-12 h-12 text-blue-600" />,
@@ -155,25 +155,25 @@ const LandingPage = () => {
                                 desc: "Once a threshold is breached, funds are dispatched to your wallet within milliseconds."
                             }
                         ].map((feature, idx) => (
-                            <div key={idx} className="feature-card group p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 transition-all hover:bg-white hover:shadow-2xl hover:shadow-blue-500/10">
+                            <div key={idx} className="feature-card group p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] bg-slate-50 border border-slate-100 transition-all hover:bg-white hover:shadow-2xl hover:shadow-blue-500/10">
                                 <div className="mb-8 w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 group-hover:scale-110 transition-transform">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4 tracking-tight">{feature.title}</h3>
-                                <p className="text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
+                                <p className="text-slate-500 leading-relaxed font-medium text-sm md:text-base">{feature.desc}</p>
                             </div>
                         ))}
                     </div>
 
                     {/* Secondary Section in White Area */}
-                    <div className="mt-32 p-16 rounded-[3.5rem] bg-[#071426] text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div className="mt-20 md:mt-32 p-10 md:p-16 rounded-[2.5rem] md:rounded-[3.5rem] bg-[#071426] text-white relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-12 text-center md:text-left">
                         <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 blur-[120px] rounded-full"></div>
-                        <div className="relative z-10 max-w-2xl">
-                            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Ready to join the future of insurance?</h2>
-                            <p className="text-lg text-slate-400 mb-0">Join 45,000+ gig workers across 20 cities using GigShield to secure their livelihood.</p>
+                        <div className="relative z-10 max-w-2xl px-4 md:px-0">
+                            <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Ready to join the future of insurance?</h2>
+                            <p className="text-base md:text-lg text-slate-400 mb-0">Join 45,000+ gig workers across 20 cities using GigShield to secure their livelihood.</p>
                         </div>
-                        <div className="relative z-10 flex gap-4 shrink-0">
-                            <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-all">
+                        <div className="relative z-10 flex w-full md:w-auto shrink-0">
+                            <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-all w-full md:w-auto text-center">
                                 Open Account
                             </Link>
                         </div>

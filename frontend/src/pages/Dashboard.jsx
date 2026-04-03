@@ -69,14 +69,14 @@ const Dashboard = () => {
         <div className="flex bg-[#0b1f3a] min-h-screen text-white font-['Inter',_sans-serif]">
             <Sidebar />
             
-            <main ref={dashboardRef} className="flex-1 p-10 overflow-auto">
-                <header className="flex justify-between items-center mb-12">
+            <main ref={dashboardRef} className="flex-1 p-6 md:p-10 overflow-x-hidden">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                     <div>
-                        <h1 className="text-4xl font-bold mb-2">Worker Dashboard</h1>
-                        <p className="text-slate-400">Everything at a glance. Stay protected.</p>
+                        <h1 className="text-3xl md:text-4xl font-bold mb-2">Worker Dashboard</h1>
+                        <p className="text-slate-400 text-sm md:text-base">Everything at a glance. Stay protected.</p>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="glass-morphism px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/5">
+                    <div className="flex gap-4 w-full md:w-auto">
+                        <div className="glass-morphism px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/5 w-full md:w-auto justify-center md:justify-start">
                             <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
                             <span className="text-sm font-semibold">Monitoring Active</span>
                         </div>
