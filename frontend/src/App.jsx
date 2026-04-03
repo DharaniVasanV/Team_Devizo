@@ -12,7 +12,7 @@ import Payouts from './pages/Payouts';
 
 const PrivateRoute = ({ children }) => {
   const { token, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-white">Loading...</div>;
+  if (loading) return <div className="min-h-screen bg-[#0b1f3a] flex items-center justify-center text-white font-['Inter',_sans-serif]">Loading...</div>;
   return token ? children : <Navigate to="/login" />;
 };
 

@@ -3,168 +3,206 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
-import { Shield, CloudRain, Briefcase, Zap, CheckCircle } from 'lucide-react';
+import { Shield, CloudRain, Briefcase, Zap, CheckCircle, ArrowRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const LandingPage = () => {
-    const heroRef = useRef(null);
-    const featuresRef = useRef(null);
+    const mainRef = useRef(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            gsap.from(".hero-title", {
-                duration: 1.5,
-                y: 100,
+            gsap.from(".hero-content > *", {
+                duration: 1.2,
+                y: 40,
                 opacity: 0,
-                ease: "power4.out",
-                stagger: 0.2
+                ease: "power3.out",
+                stagger: 0.1
             });
 
-            gsap.from(".hero-image", {
+            gsap.from(".premium-card", {
                 duration: 1.5,
-                scale: 0.8,
+                y: 60,
                 opacity: 0,
-                delay: 0.5,
+                delay: 0.4,
                 ease: "power4.out"
             });
 
             gsap.from(".feature-card", {
                 scrollTrigger: {
-                    trigger: ".feature-section",
+                    trigger: ".content-section",
                     start: "top 80%",
                 },
-                duration: 1,
-                y: 50,
+                duration: 0.8,
+                y: 30,
                 opacity: 0,
-                stagger: 0.2,
-                ease: "power3.out"
+                stagger: 0.15,
+                ease: "back.out(1.7)"
             });
-        }, heroRef);
+        }, mainRef);
 
         return () => ctx.revert();
     }, []);
 
     return (
-        <div ref={heroRef} className="min-h-screen bg-[#0f172a] text-white">
-            {/* Navbar */}
-            <nav className="fixed top-0 w-full z-50 glass-morphism border-b border-white/10">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Shield className="w-8 h-8 text-primary" />
-                        <span className="text-2xl font-bold tracking-tight">GigGuard</span>
-                    </div>
-                    <div className="flex items-center gap-8">
-                        <Link to="/login" className="text-sm font-medium hover:text-primary transition-colors">Login</Link>
-                        <Link to="/register" className="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/90 transition-all transform hover:scale-105 active:scale-95">Get Started</Link>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Hero Section */}
-            <section className="pt-40 pb-20 px-6 max-w-7xl mx-auto">
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <motion.span 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
-                        >
-                            Intelligent Parametric Insurance
-                        </motion.span>
-                        <h1 className="hero-title text-6xl md:text-7xl font-bold leading-[1.1] mb-8">
-                            Protect Your Income From <span className="gradient-text">Weather & Chaos</span>
-                        </h1>
-                        <p className="hero-title text-xl text-slate-400 mb-10 max-w-lg">
-                            The first weekly insurance designed for delivery workers. Get paid automatically when disruptions stop you from working.
-                        </p>
-                        <div className="hero-title flex flex-wrap gap-4">
-                            <Link to="/register" className="px-8 py-4 bg-primary rounded-xl font-bold text-lg hover:bg-primary/90 transition-all">Start Your Protection</Link>
-                            <a href="#features" className="px-8 py-4 bg-white/5 rounded-xl font-bold text-lg hover:bg-white/10 transition-all border border-white/10">How it Works</a>
+        <div ref={mainRef} className="min-h-screen bg-white font-['Inter',_sans-serif]">
+            {/* 1. MAIN BACKGROUND (TOP SECTION) */}
+            <div className="bg-gradient-to-b from-[#0b1f3a] via-[#0d2a4a] to-[#071426] text-white overflow-hidden pb-32">
+                {/* Navbar */}
+                <nav className="w-full relative z-50">
+                    <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                <Shield className="w-6 h-6 text-white" />
+                            </div>
+                            <span className="text-2xl font-bold tracking-tight">GigShield</span>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <Link to="/login" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
+                            <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-blue-600/20 transition-all transform hover:scale-105 active:scale-95">Open Account</Link>
                         </div>
                     </div>
-                    <div className="hero-image relative">
-                        <div className="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
-                        <div className="relative glass-morphism p-8 rounded-3xl border border-white/10">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-6 bg-slate-800/50 rounded-2xl border border-white/5">
-                                    <CloudRain className="w-8 h-8 text-blue-400 mb-4" />
-                                    <div className="text-sm text-slate-400 mb-1">Heavy Rain</div>
-                                    <div className="text-2xl font-bold">50mm/hr</div>
+                </nav>
+
+                {/* 2. HERO SECTION STYLE (CENTERED) */}
+                <section className="pt-24 pb-12 px-6 text-center max-w-4xl mx-auto relative hero-content">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-black uppercase tracking-widest mb-8 backdrop-blur-md"
+                    >
+                        <Zap size={14} /> Next-Gen Income Protection
+                    </motion.div>
+                    
+                    <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-8">
+                        The Operating System for <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-300">Gig Protection</span>
+                    </h1>
+                    
+                    <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                        Secure your daily earnings with parametric insurance. Instant payouts triggered by AI analysis of weather and city data.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+                        <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-blue-600/30 transition-all flex items-center gap-2">
+                            Secure Your Gig <ArrowRight size={20} />
+                        </Link>
+                        <a href="#features" className="border border-white/10 hover:border-white/20 bg-white/5 text-white px-10 py-4 rounded-xl text-lg font-bold backdrop-blur-md transition-all">
+                            Explore Plans
+                        </a>
+                    </div>
+
+                    {/* 4. GLASS/GRADIENT CARD (CENTER ELEMENT) */}
+                    <div className="relative premium-card group">
+                        <div className="absolute -inset-10 bg-blue-500/20 blur-[100px] rounded-full opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                        <div className="relative bg-gradient-to-br from-blue-400/20 to-blue-700/30 backdrop-blur-3xl rounded-[2.5rem] border border-white/20 p-10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
+                            <div className="grid md:grid-cols-3 gap-8">
+                                <div className="text-left space-y-2">
+                                    <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4 border border-white/10">
+                                        <CloudRain className="text-blue-400" />
+                                    </div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Monitoring</div>
+                                    <div className="text-2xl font-black italic">Precipitation</div>
+                                    <div className="text-3xl font-bold text-blue-400">55mm / hr</div>
                                 </div>
-                                <div className="p-6 bg-slate-800/50 rounded-2xl border border-white/5">
-                                    <Zap className="w-8 h-8 text-yellow-500 mb-4" />
-                                    <div className="text-sm text-slate-400 mb-1">Status</div>
-                                    <div className="text-green-500 font-bold flex items-center gap-1">
-                                        Active <CheckCircle className="w-4 h-4" />
+                                <div className="text-left space-y-2 border-l border-white/10 pl-8">
+                                    <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4 border border-white/10">
+                                        <Zap className="text-yellow-400" />
+                                    </div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase tracking-widest">Payout Engine</div>
+                                    <div className="text-2xl font-black italic">Claim Status</div>
+                                    <div className="text-emerald-400 font-bold flex items-center gap-2">
+                                        Approved <CheckCircle size={20} />
                                     </div>
                                 </div>
-                                <div className="col-span-2 p-6 bg-primary/10 rounded-2xl border border-primary/30">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div className="text-sm font-bold text-primary">CLAIM TRIGGERED</div>
-                                        <div className="text-xs text-slate-500">2 mins ago</div>
+                                <div className="bg-white/10 rounded-3xl p-6 border border-white/20 text-left">
+                                    <div className="text-slate-300 text-xs font-bold mb-4 flex justify-between items-center">
+                                        <span>ESTIMATED PAYOUT</span>
+                                        <span className="text-[10px] bg-blue-500 px-2 py-0.5 rounded-full">LIVE</span>
                                     </div>
-                                    <div className="text-3xl font-bold mb-2">₹500.00</div>
-                                    <div className="text-sm text-slate-400">Automated payout initiated</div>
+                                    <div className="text-4xl font-black mb-1">₹750</div>
+                                    <div className="text-xs text-slate-500">Transferred to account • Just now</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            {/* Features Section */}
-            <section id="features" className="feature-section py-20 px-6 max-w-7xl mx-auto">
-                <div className="text-center mb-20">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6">Built For The Modern Worker</h2>
-                    <p className="text-xl text-slate-400">No paperwork. No inspections. Just instant protection.</p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-8">
-                    {[
-                        {
-                            icon: <CloudRain className="w-10 h-10 text-primary" />,
-                            title: "Automatic Triggers",
-                            desc: "We monitor weather & traffic data. When disruptions cross thresholds, your claim starts instantly."
-                        },
-                        {
-                            icon: <Briefcase className="w-10 h-10 text-secondary" />,
-                            title: "Income Protection",
-                            desc: "Specifically designed to cover the earnings you lose during heavy rain, heatwaves, or pollution."
-                        },
-                        {
-                            icon: <Zap className="w-10 h-10 text-accent" />,
-                            title: "Weekly Plans",
-                            desc: "Affordable weekly subscriptions. Only pay for what you need, when you need it."
-                        }
-                    ].map((feature, idx) => (
-                        <div key={idx} className="feature-card glass-morphism p-10 rounded-3xl border border-white/10 hover:border-primary/30 transition-all hover:translate-y-[-8px]">
-                            <div className="mb-6">{feature.icon}</div>
-                            <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                            <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+            {/* 3. WHITE CONTENT SECTION (CARD AREA) */}
+            <section id="features" className="content-section relative -mt-20 z-10 bg-white text-black rounded-t-[3.5rem] shadow-[0_-40px_100px_-20px_rgba(0,0,0,0.1)] px-6 pt-24 pb-32">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-24 max-w-3xl mx-auto">
+                        <span className="text-blue-600 font-black text-xs uppercase tracking-[0.2em] mb-4 block">Engineered for Reliability</span>
+                        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">Designed for the world's ambitious gig workers.</h2>
+                        <p className="text-xl text-slate-500 leading-relaxed">GigShield handles the complexity of environmental risk so you can focus on your business.</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-12">
+                        {[
+                            {
+                                icon: <CloudRain className="w-12 h-12 text-blue-600" />,
+                                title: "Oracle Verification",
+                                desc: "No manual claims. We use verified network nodes to confirm environmental disruptions in real-time."
+                            },
+                            {
+                                icon: <Briefcase className="w-12 h-12 text-blue-600" />,
+                                title: "Smart Payouts",
+                                desc: "Proprietary risk modeling ensures you get compensated proportional to the disruption level."
+                            },
+                            {
+                                icon: <Zap className="w-12 h-12 text-blue-600" />,
+                                title: "Instant Settlements",
+                                desc: "Once a threshold is breached, funds are dispatched to your wallet within milliseconds."
+                            }
+                        ].map((feature, idx) => (
+                            <div key={idx} className="feature-card group p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 transition-all hover:bg-white hover:shadow-2xl hover:shadow-blue-500/10">
+                                <div className="mb-8 w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 group-hover:scale-110 transition-transform">
+                                    {feature.icon}
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4 tracking-tight">{feature.title}</h3>
+                                <p className="text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Secondary Section in White Area */}
+                    <div className="mt-32 p-16 rounded-[3.5rem] bg-[#071426] text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-12">
+                        <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 blur-[120px] rounded-full"></div>
+                        <div className="relative z-10 max-w-2xl">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Ready to join the future of insurance?</h2>
+                            <p className="text-lg text-slate-400 mb-0">Join 45,000+ gig workers across 20 cities using GigShield to secure their livelihood.</p>
                         </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="py-20 px-6 max-w-7xl mx-auto text-center">
-                <div className="bg-gradient-to-r from-primary to-secondary p-1 rounded-[3rem]">
-                    <div className="bg-[#0f172a] p-16 rounded-[2.8rem]">
-                        <h2 className="text-4xl md:text-6xl font-bold mb-8">Ready To Secure Your Earnings?</h2>
-                        <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
-                            Join thousands of delivery partners from Zomato, Swiggy, and Amazon who trust GigGuard for their peace of mind.
-                        </p>
-                        <Link to="/register" className="px-10 py-5 bg-primary rounded-2xl font-bold text-xl hover:bg-primary/90 transition-all">Get Protected Now</Link>
+                        <div className="relative z-10 flex gap-4 shrink-0">
+                            <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-all">
+                                Open Account
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="py-12 border-t border-white/5 opacity-50 px-6 text-center text-sm">
-                © 2026 GigGuard Parametric Insurance. Designed for the Gig Economy.
+            <footer className="bg-white py-20 px-6 border-t border-slate-100">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-xl font-bold text-slate-900">GigShield</span>
+                    </div>
+                    <div className="flex gap-10 text-sm font-semibold text-slate-500">
+                        <a href="#" className="hover:text-blue-600">Privacy Policy</a>
+                        <a href="#" className="hover:text-blue-600">Terms of Use</a>
+                        <a href="#" className="hover:text-blue-600">Developer API</a>
+                    </div>
+                    <div className="text-slate-400 text-xs font-medium uppercase tracking-widest">
+                        © 2026 GigShield Lab • Built for the Gig Economy
+                    </div>
+                </div>
             </footer>
         </div>
     );
 };
 
 export default LandingPage;
+

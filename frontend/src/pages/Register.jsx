@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Phone, Lock, User, MapPin, Truck } from 'lucide-react';
+import { Shield, Phone, Lock, User, MapPin, Truck, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
@@ -31,99 +31,134 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-white flex flex-col justify-center items-center p-6">
+        <div className="min-h-screen bg-gradient-to-b from-[#0b1f3a] via-[#0d2a4a] to-[#071426] flex flex-col items-center justify-center p-6 font-['Inter',_sans-serif] py-20">
+            <Link to="/" className="flex items-center gap-2 mb-12 group transition-all">
+                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-2xl shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                    <Shield className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold tracking-tight text-white">GigShield</span>
+            </Link>
+
             <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md glass-morphism p-10 rounded-[2.5rem] border border-white/10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-lg bg-white rounded-[2.5rem] p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
             >
                 <div className="text-center mb-10">
-                    <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-                    <h2 className="text-3xl font-bold">Join GigGuard</h2>
-                    <p className="text-slate-400 mt-2">Protect your earnings today</p>
+                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Create your account</h2>
+                    <p className="text-slate-500 mt-2 font-medium">Join 45,000+ workers securing their future</p>
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm text-center">
+                    <div className="mb-8 p-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl text-sm font-bold text-center">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                        <input 
-                            type="text" 
-                            placeholder="Full Name"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-primary transition-all outline-none"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            required
-                        />
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                            <div className="relative group">
+                                <User className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                                <input 
+                                    type="text" 
+                                    placeholder="John Doe"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none text-slate-900 font-bold"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                            <div className="relative group">
+                                <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                                <input 
+                                    type="tel" 
+                                    placeholder="888 000 1234"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none text-slate-900 font-bold"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                    required
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                        <input 
-                            type="tel" 
-                            placeholder="Phone Number"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-primary transition-all outline-none"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            required
-                        />
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Choose Password</label>
+                        <div className="relative group">
+                            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                            <input 
+                                type="password" 
+                                placeholder="••••••••"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none text-slate-900 font-bold"
+                                value={formData.password}
+                                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                required
+                            />
+                        </div>
                     </div>
-                    <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                        <input 
-                            type="password" 
-                            placeholder="Password"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-primary transition-all outline-none"
-                            value={formData.password}
-                            onChange={(e) => setFormData({...formData, password: e.target.value})}
-                            required
-                        />
-                    </div>
-                    <div className="relative">
-                        <Truck className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                        <select 
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-primary transition-all outline-none appearance-none"
-                            value={formData.platform}
-                            onChange={(e) => setFormData({...formData, platform: e.target.value})}
-                        >
-                            <option value="Zomato">Zomato</option>
-                            <option value="Swiggy">Swiggy</option>
-                            <option value="Amazon">Amazon</option>
-                            <option value="Zepto">Zepto</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                        <input 
-                            type="text" 
-                            placeholder="City"
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-primary transition-all outline-none"
-                            value={formData.city}
-                            onChange={(e) => setFormData({...formData, city: e.target.value})}
-                            required
-                        />
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Working Platform</label>
+                            <div className="relative group">
+                                <Truck className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none" />
+                                <select 
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none text-slate-900 font-bold appearance-none cursor-pointer"
+                                    value={formData.platform}
+                                    onChange={(e) => setFormData({...formData, platform: e.target.value})}
+                                >
+                                    <option value="Zomato">Zomato</option>
+                                    <option value="Swiggy">Swiggy</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="Zepto">Zepto</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Operating City</label>
+                            <div className="relative group">
+                                <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Bengaluru"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-6 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all outline-none text-slate-900 font-bold"
+                                    value={formData.city}
+                                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                                    required
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full py-4 bg-primary rounded-2xl font-bold text-lg hover:bg-primary/90 transition-all transform active:scale-95 disabled:opacity-50"
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-600/20 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
                     >
-                        {loading ? "Creating Account..." : "Create Account"}
+                        {loading ? "Creating Account..." : "Start Protection"}
+                        {!loading && <ArrowRight size={20} />}
                     </button>
                 </form>
 
-                <p className="text-center mt-8 text-slate-500">
-                    Already have an account? <Link to="/login" className="text-primary font-bold hover:underline">Login</Link>
-                </p>
+                <div className="mt-10 pt-10 border-t border-slate-50 text-center">
+                    <p className="text-slate-500 font-medium">
+                        Already protected? <Link to="/login" className="text-blue-600 font-bold hover:underline">Log In</Link>
+                    </p>
+                </div>
             </motion.div>
+            
+            <p className="mt-12 text-slate-500/50 text-[10px] font-black uppercase tracking-[0.3em]">
+                Secure Banking Standard • 256-bit Encryption
+            </p>
         </div>
     );
 };
 
 export default Register;
+

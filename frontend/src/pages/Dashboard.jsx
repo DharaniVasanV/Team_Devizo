@@ -66,7 +66,7 @@ const Dashboard = () => {
     }, [loading]);
 
     return (
-        <div className="flex bg-[#0f172a] min-h-screen text-white">
+        <div className="flex bg-[#0b1f3a] min-h-screen text-white font-['Inter',_sans-serif]">
             <Sidebar />
             
             <main ref={dashboardRef} className="flex-1 p-10 overflow-auto">
@@ -241,7 +241,7 @@ const Dashboard = () => {
                             >
                                 <div className="relative z-10">
                                     <h3 className="text-xl font-bold mb-2">Refer a Partner</h3>
-                                    <p className="text-indigo-100 text-sm mb-6">Earn ₹100 for every delivery partner who joins GigGuard.</p>
+                                    <p className="text-indigo-100 text-sm mb-6">Earn ₹100 for every delivery partner who joins GigShield.</p>
                                     <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest backdrop-blur-md border border-white/20">
                                         Invite Now <ArrowUpRight size={14} />
                                     </div>

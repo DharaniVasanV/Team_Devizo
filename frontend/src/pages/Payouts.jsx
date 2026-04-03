@@ -32,7 +32,7 @@ const Payouts = () => {
     }, []);
 
     return (
-        <div className="flex bg-[#0f172a] min-h-screen text-white font-sans">
+        <div className="flex bg-[#0b1f3a] min-h-screen text-white font-['Inter',_sans-serif]">
             <Sidebar />
             
             <main className="flex-1 p-10 overflow-auto">
