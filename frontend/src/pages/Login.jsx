@@ -33,7 +33,7 @@ const Login = () => {
                 <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-2xl shadow-blue-600/20 group-hover:scale-110 transition-transform">
                     <Shield className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-3xl font-bold tracking-tight text-white">GigShield</span>
+                <span className="text-3xl font-bold tracking-tight text-white">PayProtect</span>
             </Link>
 
             <motion.div 
