@@ -1,41 +1,24 @@
-const cron = require('node-cron');
-const axios = require('axios');
-const Policy = require('../models/Policy');
-const Claim = require('../models/Claim');
-const User = require('../models/User');
-
-const disruptionThresholds = {
-    rain: 50, // mm
-    heat: 40, // celsius
-    pollution: 300 // AQI
-};
+const weatherService = require('./weatherService');
 
 const checkDisruptions = async () => {
     console.log('Running disruption check scheduler...');
     try {
-        const activePolicies = await Policy.find({ status: 'active' });
+        const activePolicies = await Policy.find({ status: 'active' }).populate('userId');
         
         for (const policy of activePolicies) {
-            // In a real app, you would call a Weather API using policy user's city
-            // For this demo, we simulate a disruption check
-            const simulatedRain = Math.random() * 100;
-            const simulatedHeat = Math.random() * 50;
+            const user = policy.userId;
+            if (!user || (!user.city && !user.workerZone)) continue;
+
+            const weather = await weatherService.fetchWeatherDataByCity(user.city || user.workerZone);
+            if (!weather) continue;
+
+            const riskLevel = weatherService.predictRiskLevel(weather);
             
-            let disruptionDetected = false;
-            let triggerType = '';
-            let disruptionValue = 0;
+            // Only trigger claims for Medium or High risk
+            if (riskLevel !== 'LOW') {
+                const triggerType = riskLevel === 'HIGH' ? `Critical Disruption (${weather.condition})` : `Standard Disruption (${weather.condition})`;
+                const disruptionValue = `${weather.rain}mm rain, ${weather.temp}°C`;
 
-            if (simulatedRain > disruptionThresholds.rain) {
-                disruptionDetected = true;
-                triggerType = 'Heavy Rain';
-                disruptionValue = simulatedRain.toFixed(1) + 'mm';
-            } else if (simulatedHeat > disruptionThresholds.heat) {
-                disruptionDetected = true;
-                triggerType = 'Extreme Heat';
-                disruptionValue = simulatedHeat.toFixed(1) + '°C';
-            }
-
-            if (disruptionDetected) {
                 // Check if a claim already exists for this policy and today
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -46,39 +29,42 @@ const checkDisruptions = async () => {
                 });
 
                 if (!existingClaim) {
-                    
                     let claimStatus = 'approved';
-                    const simulatedAqi = Math.random() * 500;
-                    const simulatedDeliveryHours = Math.random() * 24;
-
+                    
+                    // Call ML model for fraud verification as before
                     try {
                         const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, {
-                            rainfall: simulatedRain,
-                            temperature: simulatedHeat,
-                            aqi: simulatedAqi,
-                            delivery_hours: simulatedDeliveryHours
+                            rainfall: weather.rain,
+                            temperature: weather.temp,
+                            aqi: Math.random() * 300, // Simulated AQI
+                            delivery_hours: Math.random() * 24
                         });
 
                         if (mlResponse.data && mlResponse.data.prediction === -1) {
                             claimStatus = 'fraud suspected';
-                        } else if (mlResponse.data && mlResponse.data.prediction === 1) {
-                            claimStatus = 'approved';
                         }
                     } catch (mlError) {
-                        console.error('ML service error in scheduler:', mlError.message);
-                        claimStatus = 'pending'; // fallback
+                        console.error('ML service error:', mlError.message);
+                        claimStatus = 'pending';
                     }
+
+                    const claimCount = riskLevel === 'HIGH' ? 2 : 1; 
+                    const baseAmount = policy.planType === 'Premium' ? 750 : policy.planType === 'Standard' ? 500 : 250;
 
                     const claim = new Claim({
                         policyId: policy._id,
-                        userId: policy.userId,
+                        userId: user._id,
                         triggerType,
-                        claimAmount: 500, // Fixed payout for disruption for demo
-                        disruptionDetails: { value: disruptionValue, threshold: disruptionThresholds },
+                        claimAmount: baseAmount, 
+                        disruptionDetails: { 
+                            value: disruptionValue, 
+                            risk: riskLevel,
+                            weather: weather.description
+                        },
                         status: claimStatus
                     });
                     await claim.save();
-                    console.log(`Automatic claim triggered for user ${policy.userId} due to ${triggerType}. Status: ${claimStatus}`);
+                    console.log(`Automatic claim triggered for ${user.name} in ${user.city}. Risk: ${riskLevel}`);
                 }
             }
         }

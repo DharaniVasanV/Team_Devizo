@@ -8,7 +8,13 @@ For example, gig economy workers like **delivery partners** need to earn their d
 
 The traditional insurance system cannot protect gig workers in these situations. Insurance policies are designed to be **long-term contracts** that are intricate in nature. They often require **manual verification processes** that are cumbersome for gig workers to access.
 
-**GigGuard** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, automated triggers, and fraud detection* to create a **fast, transparent, and secure system**.
+**GigGuard** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, real-time weather alerts via OpenWeather API, and automated triggers* to create a **fast, transparent, and secure system**.
+
+### Recently Added: Weather-Aware Intelligent Pricing
+- **Real-time Data**: Integrated with OpenWeather API to fetch current rainfall, wind speed, and severe weather alerts.
+- **Region Caching**: Implemented geographic proximity grouping (rounded lat/lon) with a 10-minute caching mechanism to minimize API usage and costs.
+- **Dynamic Pricing Engine**: Automatically adjusts premiums based on high-risk weather conditions (e.g., storms, heavy rain).
+- **Direct Platform Integration**: Ready for Swiggy-style delivery platform data syncing.
 
 ---
 

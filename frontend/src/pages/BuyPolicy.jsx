@@ -19,17 +19,30 @@ const BuyPolicy = () => {
     const dummyUserId = "60c72b2f9b1d8b3a0c8e4d1f"; // valid hex fallback
 
     React.useEffect(() => {
-        const fetchRisk = async () => {
+        const fetchRisk = async (lat = null, lon = null) => {
             try {
                 const token = localStorage.getItem('token');
                 const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/policy/calculate-risk`, config);
+                let url = `${import.meta.env.VITE_API_URL}/api/policy/calculate-risk`;
+                if(lat && lon) url += `?lat=${lat}&lon=${lon}`;
+                
+                const res = await axios.get(url, config);
                 setRiskData(res.data);
             } catch (err) {
                 console.error("Failed to fetch risk", err);
             }
         };
-        fetchRisk();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchRisk(position.coords.latitude, position.coords.longitude);
+                },
+                () => fetchRisk() // fallback if user denies
+            );
+        } else {
+            fetchRisk();
+        }
     }, []);
 
     const basePremium = riskData?.recommended_premium || 199;
