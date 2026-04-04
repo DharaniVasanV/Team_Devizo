@@ -1,31 +1,396 @@
-# Adversarial Defense & Anti-Spoofing Strategy
 
-This repository contains the core logic and machine learning architecture for detecting anomalous gig worker activity, specifically focusing on identifying coordinated fraud rings and spoofing. 
+# GigGuard AI
+### AI-Powered Parametric Insurance Platform for Gig Workers
 
-## 1. The Differentiation: Genuine vs. Bad Actor
+# 1. Introduction
 
-To distinguish between a genuinely stranded delivery partner (e.g., facing vehicle breakdown, bad weather, or network drop) and a bad actor spoofing their location, our ML architecture employs an **Isolation Forest** anomaly detection model. Instead of relying on a single threshold or rule-based system, the model looks at the multidimensional context of the worker's behavior. 
+For example, gig economy workers like **delivery partners** need to earn their daily income to support their livelihoods. However, they are more likely to be affected by **environmental disruptions** like **heavy rainfall**, **extreme heat waves**, **bad air quality**, **traffic restrictions**, or any **emergency-like situations**. In such cases, they are unable to work and thus lose their daily earnings.
 
-A genuinely stranded partner might display an expected anomaly, such as a sudden spike in `late_delivery_rate` or a drop in `tasks_completed_per_day`. However, their hardware and foundational app interaction patterns remain consistent. In contrast, a bad actor utilizing GPS spoofing or automated botting will display hyper-efficient but technically anomalous and physically impossible behavior. For instance, completing an unrealistic number of tasks (`tasks_completed_per_day` jumping to 60-100), completing tasks in impossibly short durations (`average_task_time_minutes`), or exhibiting sudden, radical shifts in device parameters (`device_changes` and `location_changes`). The model flags these multivariate deviations—where physical constraints are violated alongside sudden technical shifts—as coordinated spoofing.
+The traditional insurance system cannot protect gig workers in these situations. Insurance policies are designed to be **long-term contracts** that are intricate in nature. They often require **manual verification processes** that are cumbersome for gig workers to access.
 
-## 2. The Data: Beyond Basic GPS Coordinates
+**GigGuard** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, automated triggers, and fraud detection* to create a **fast, transparent, and secure system**.
 
-While basic GPS coordinates are easily manipulated by bad actors, our system analyzes a rich matrix of behavioral and technical data points to detect coordinated fraud rings:
+---
 
-*   **Device & Hardware Footprint (`device_changes`, `location_changes`)**: Frequent switching between devices or unrealistic teleportation between disparate geographic zones in short time frames strongly indicates spoofing software or account sharing.
-*   **Temporal Improbabilities (`average_task_time_minutes`, `login_hours_per_day`)**: Consistently completing deliveries in 1-5 minutes or staying uniformly active and moving for 16-24 hours without realistic human pauses suggests bot automation or location spoofing.
-*   **Operational Metrics (`tasks_completed_per_day`, `distance_travelled_km`)**: Completing an excessive number of tasks combined with abnormally high or disjointed travel distances (e.g., teleporting across zones) highlights synthetic activity.
-*   **Financial & Quality Indicators (`payout_amount`, `customer_rating`, `cancellation_rate`)**: Fraud rings often maximize volume over quality, leading to massive, disproportionate payouts coupled with unusual cancellation behaviors and extremely low customer ratings (e.g., 1.0 - 2.5).
+# 2. Platform Simulation: Delivery Ecosystem Integration
 
-By feeding these combined data points into the Isolation Forest model, we create a robust fingerprint of normal behavior that coordinated fraud networks cannot easily mimic without losing their efficiency and economic incentive.
+To simulate a real-world gig economy environment, the system has a *Swiggy-style delivery application clone*.
 
-## 3. The UX Balance: Fair Handling of Flagged Claims
+This is a clone of a real-world delivery application used by delivery partners. It simulates **real-world activity data** that can be used by the insurance system.
 
-Our workflow is designed to investigate flags without automatically suspending or penalizing honest gig workers who might just be experiencing bad weather or a dead phone battery. 
+This application provides data such as:
 
-1.  **Risk Stratification**: The system outputs a continuous "Anomaly Score" rather than a rigid binary block. Scores are categorized into `LOW`, `MEDIUM`, and `HIGH` risk levels. 
-2.  **Frictionless Verification for Medium Risk**: For `MEDIUM` risk anomalies (e.g., strange network drops or delayed GPS syncs causing brief location jumps), the system does not suspend the worker. Instead, it might trigger a lightweight, frictionless verification step (e.g., a simple in-app confirmation or a brief pause in accepting new high-value orders until the signal stabilizes).
-3.  **Human-in-the-Loop for High Risk**: `HIGH` risk scores—characterized by impossible metrics like 5 device changes, 80 tasks, and zero travel time—temporarily flag the account but trigger an automated deep-dive review. The claim is routed to a specialized Trust & Safety team dashboard before irreversible action is taken. 
-4.  **Context-Aware Grace Periods**: If a worker has a historically strong profile (consistent normal behavior over months) and is in a region currently experiencing known severe weather or network outages, the system dynamically weights their temporary anomalies differently, defaulting to a presumption of "genuine distress" rather than "spoofing."
+- Delivery partner activity  
+- Delivery locations  
+- Worker operational status  
+- Working hours  
+- Delivery routes  
 
-By utilizing an anomaly score with tiered, context-aware interventions, we ensure the platform remains aggressively secure against fraud rings while maintaining a supportive, fair, and seamless user experience for honest partners.
+This data is obtained by the insurance system through an *API key generated by the delivery application*.
+
+### Live Demo Application
+https://swiggy-frontend-4248.onrender.com
+
+---
+
+# 3. Problem Statement
+
+The unpredictable **loss of income** faced by gig workers in response to **environmental and social upsets**. Unlike regular employees, they do not receive any form of **compensation** when they cannot go to work.
+
+### The challenges in the industry are:
+
+- Income loss in response to **extreme weather conditions**
+- Disruption of operations in response to **traffic or city restrictions**
+- **Inadequate flexibility** in insurance solutions
+- **Inefficient and intricate** claim settlement systems
+- **Inadequate fraud prevention** in automated systems
+
+The goal of the project is to develop a system that can offer *automated income protection with good fraud resistance*.
+
+---
+
+# 4. Persona Based Scenario
+
+### Persona: Rahul – Delivery Partner
+
+Rahul is a delivery partner working in an **urban city**. He earns based on the **number of deliveries he makes every day**.
+
+Rahul might stop working during **heavy rainfalls** or **extreme heat wave conditions**. In the same way, he might not be able to make deliveries during **severe traffic congestion** or due to **road blockages**.
+
+Rahul can buy a *weekly micro-insurance policy* through **GigGuard**.
+
+### Scenario Workflow
+
+1. Rahul accesses the application and sees the insurance options available.  
+2. It checks the **environmental and social disruption risks**.  
+3. It calculates the **premium for a weekly plan**.  
+4. Rahul makes the **payment through the payment gateway**.  
+5. If disruption conditions occur during the insured period, the system detects the disruption.  
+6. It checks the claim through **fraud detection**.  
+7. Once verified, it processes the payment.  
+
+In this way, Rahul can get insurance benefits **without having to undergo any complicated claims process**.
+
+---
+
+# 5. Weekly Premium Model
+
+The platform utilizes a **weekly micro-insurance model** as opposed to traditional long-term insurance.
+
+Gig workers have **varying schedules and varying levels of income**. The weekly insurance provides **flexibility** for workers as they can purchase insurance as needed.
+
+The premium is calculated using a **risk prediction model**.
+
+The model takes into account both **environmental disruptions** and **social disruptions**.
+
+This premium is determined through a **dynamic calculation via a risk prediction model** that takes both risks into account.
+
+---
+
+## Environmental Disruption Signals (Weather APIs)
+
+These signals help identify situations where **delivery personnel might not be able to operate effectively**.
+
+Some of these factors include:
+
+- Rainfall levels  
+- Temperature conditions  
+- Air Quality Index (`AQI`)  
+- Expected working hours  
+- Historical environmental patterns  
+
+---
+
+## Social Disruption Signals (Traffic & News APIs)
+
+In addition, the system also takes into consideration **disruptions in urban mobility**, which might influence the operation of delivery personnel.
+
+Some of these factors include:
+
+- Severe traffic conditions  
+- Road closures or restricted areas  
+- Presence of demonstrations and city events  
+- Emergency situations  
+- Disruptions via **news APIs**  
+
+Through these signals, a **disruption risk score** is determined, which in turn determines the **premium for a given week**.
+
+---
+
+## Income Loss Estimation
+
+Upon occurrence of a disruption trigger, the system will proceed to estimate the **income loss of the worker** by utilizing historical data on deliveries received from the delivery platform.
+
+### Average Hourly Income
+
+```
+Average Hourly Income = Total Earnings of Worker (in last 7 days) / Total Hours Worked by Worker
+```
+
+### Daily Income
+
+```
+Daily Income = Average Hourly Income × Average Daily Working Hours
+```
+
+### Income Loss
+
+```
+Income Loss = Daily Income × Disruption Days
+```
+
+Subsequently, the **insurance payment** will then be determined as a **percentage of income loss**.
+
+---
+
+# 6. Parametric Trigger System
+
+Unlike conventional insurance, where claims have to be filed, **GigGuard utilizes parametric triggers**.
+
+**Parametric Insurance:**  
+Parametric insurance is activated **as soon as disruption conditions occur**.
+
+---
+
+## Environmental Triggers
+
+- Rainfall intensity beyond a certain level  
+- Extreme heat  
+- Pollution levels  
+
+---
+
+## Social Disruption Triggers
+
+- Heavy traffic congestion  
+- Blockages on roads  
+- Disruptions on transportation within a city  
+- Public events impacting mobility of delivery  
+
+As soon as these triggers occur, the system will **recognize eligible members and start the claim validation process**.
+
+---
+
+# 7. AI / ML Integration
+
+Artificial Intelligence and Machine Learning are integrated into the system to facilitate *fraud detection* and *insurance pricing*.  
+Two machine learning models are integrated into the system. These models work simultaneously to ensure the security of the claim process and the accuracy of the insurance premiums.
+
+### Live API Documentation
+https://team-devizo.onrender.com/docs
+
+---
+
+## 7.1 Anomaly Detection Model (`/predict`)
+
+### Purpose
+
+This model detects whether the gig worker's activity is *normal or suspicious*.  
+It is useful for identifying fraudulent workers, abnormal behavior patterns, and misuse of the insurance system.
+
+### Model Approach
+
+This system uses an *Isolation Forest Anomaly Detection Model* based on the behavior of the gig workers.  
+It detects unusual patterns of behavior from normal worker behavior.
+
+### Features Used
+
+This model uses the behavior of the workers based on the following features:
+
+- `tasks_completed_per_day`
+- `average_task_time_minutes`
+- `distance_travelled_km`
+- `payout_amount`
+- `customer_rating`
+- `login_hours_per_day`
+- `device_changes`
+- `location_changes`
+- `cancellation_rate`
+- `late_delivery_rate`
+
+### Use Cases
+
+- Fraud detection  
+- Abnormal worker behavior  
+- Security of the system  
+
+---
+
+## 7.2 Risk Prediction Model (`/predict-risk`)
+
+### Purpose
+
+The purpose of this model is to predict the disruption risk level and recommended insurance premium.  
+This model is useful for dynamic insurance pricing and decision making.
+
+### Features Used
+
+The features used in this model for evaluating the disruption risk are:
+
+- `rainfall`
+- `temperature`
+- `aqi`
+- `delivery_hours`
+
+### Outputs
+
+The output of this model is:
+
+- `risk_score` – the numerical value of the disruption risk  
+- `risk_level` – the category of the disruption risk (Low, Medium, High)  
+- `recommended_premium` – the recommended insurance premium for a week  
+
+### Model Workflow
+
+1. Data on the environment and workload is input into the system.
+2. The disruption *risk score* is calculated by the model.
+3. The risk score is then used to determine a *risk category*.
+4. Based on this risk category, the *recommended insurance premium* is determined.
+
+### Use Cases
+
+- Dynamic Premium Calculation  
+- Climate-Based Insurance Premiums  
+- Worker Safety Analysis  
+
+
+## Combined System Workflow
+
+1. The *Anomaly Detection Model* is used to analyze worker activity and determine if fraud is present.
+2. The *Risk Prediction Model* is used to determine disruption risk in the environment.
+3. The dynamic *insurance premiums and claims* are calculated based on this data.
+
+---
+# 8. Simulated Payment System
+
+There exists a *simulated payment gateway* which is used for simulating the actual purchase of insurance.
+
+### Process
+
+1. A plan selection option is displayed.  
+2. A payment confirmation window is displayed.  
+3. A **transaction ID** is generated.  
+4. The transaction is recorded.  
+5. The plan is **activated immediately**.
+
+---
+
+# 9. Adversarial Defense & Anti-Spoofing Strategy
+
+This system also includes a **fraud detection layer** that detects abnormal activity from gig workers, such as:
+
+- groups of workers working in coordination to perpetrate fraud  
+- spoofing of GPS locations  
+- bot activity  
+
+## Differentiating Genuine Workers vs Bad Actors
+
+To differentiate between genuine workers and bad actors, this platform makes use of an *Isolation Forest anomaly detection model*.
+
+Unlike traditional rule-based systems, this model uses **multiple behavioral signals** for evaluation.
+
+A genuine stranded worker may show:
+
+- delayed delivery of goods  
+- fewer tasks accomplished  
+
+However, their **device activity patterns remain consistent**.
+
+Spoofing attacks often show:
+
+- unrealistically high `tasks_completed_per_day`
+- unrealistically low `average_task_time_minutes`
+- unrealistic `device_changes` and `location_changes`
+
+## Data Signals Used for Fraud Detection
+
+To avoid GPS spoofing manipulation, the system evaluates **multiple behavioral and technical signals**.
+
+### Device & Hardware Signals
+
+- change in device used  
+- unrealistic jumps between delivery zones  
+
+### Temporal Behavior Signals
+
+- abnormal delivery time  
+- excessive daily login hours  
+
+### Operational Metrics
+
+- unusually high tasks accomplished per day  
+- abnormal distances traveled  
+
+### Financial & Quality Indicators
+
+- unusually high payouts  
+- abnormal cancellation rates  
+- unusually low customer ratings  
+
+## Fair Handling of Flagged Claims
+
+The system protects genuine workers through **risk scoring instead of immediate blocking**.
+
+### Risk Stratification
+
+The anomaly score is categorized as:
+
+- **LOW Risk – Normal Behavior**  
+- **MEDIUM Risk – Suspicious but Likely Legitimate**  
+- **HIGH Risk – High Probability of Fraud**
+
+### Medium Risk Handling
+
+Medium-risk claims trigger **temporary checks and confirmation steps**.
+
+### High Risk Handling
+
+High-risk cases are reviewed through a **Trust & Safety dashboard** before action is taken.
+
+### Context-Aware Protection
+
+If a worker has **strong historical activity** and **severe weather conditions exist**, adaptive thresholds prevent unfair penalties.
+
+This layered approach protects the system while maintaining a **fair experience for genuine workers**.
+
+---
+
+# 10. Development Plan
+
+The project is designed to be completed in **three phases**.
+
+### Phase 1: Development of the Platform
+
+Frontend, backend, and database infrastructure are built.  
+Users can **register and purchase weekly insurance policies**.
+
+### Phase 2: Development of AI and Parametric Triggers
+
+AI models are integrated.  
+Environmental and social disruptions are monitored and **claims processing begins**.
+
+### Phase 3: Development of Security and System Optimization
+
+Anti-spoofing mechanisms are implemented and the system is **optimized**.
+
+---
+
+# 11. Future Enhancements
+
+Possible improvements for the future may be:
+
+- Integration with real **weather data providers**
+- Real **payment gateway integration**
+- Improved **behavioral fraud detection models**
+- **Mobile application deployment**
+- Direct integration with **real delivery platforms**
+
+This will help in transforming the platform into a **deployable insurance solution**.
+
+---
+
+# Conclusion
+
+**GigGuard** is a great example of how **parametric insurance, machine learning, and real-time disruption detection** can be leveraged to develop an effective income protection solution for gig workers.
+
+With the use of **environmental data**, **social disruptions**, and **strong fraud detection capabilities**, a **scalable and secure insurance solution** for the gig workforce is achieved.
