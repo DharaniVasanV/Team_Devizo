@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Phone, Lock, ArrowRight } from 'lucide-react';
+import { Shield, Phone, Lock, ArrowRight, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -29,12 +29,17 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#0b1f3a] via-[#0d2a4a] to-[#071426] flex flex-col items-center justify-center p-6 font-['Inter',_sans-serif]">
-            <Link to="/" className="flex items-center gap-2 mb-12 group transition-all">
-                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-2xl shadow-blue-600/20 group-hover:scale-110 transition-transform">
-                    <Shield className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-3xl font-bold tracking-tight text-white">PayProtect</span>
-            </Link>
+            <nav className="fixed top-0 left-0 right-0 flex items-center justify-between px-8 py-4 bg-[#0b1f3a]/80 backdrop-blur-md border-b border-white/5 z-50">
+                <Link to="/" className="flex items-center gap-2 group">
+                    <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xl font-bold text-white">PayProtect</span>
+                </Link>
+                <Link to="/" className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white border border-white/10 hover:border-white/30 rounded-xl px-4 py-2 text-sm font-semibold transition-all">
+                    <Home size={15} /> Back to Home
+                </Link>
+            </nav>
 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}

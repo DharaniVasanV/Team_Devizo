@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log("Mongo URI:", process.env.MONGO_URI);
 
 // Fix for MongoDB DNS Resolution on Windows (Local only)
 if (process.env.NODE_ENV !== 'production' && !process.env.RENDER) {

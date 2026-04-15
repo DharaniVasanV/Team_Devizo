@@ -26,7 +26,7 @@ const Sidebar = () => {
 
     const toggleSidebar = () => setIsOpen(!isOpen);
 
-    const SidebarContent = () => (
+    const renderSidebarContent = () => (
         <React.Fragment>
             <div className="flex items-center gap-3 mb-16 px-2">
                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
@@ -85,7 +85,7 @@ const Sidebar = () => {
 
             {/* Desktop Sidebar */}
             <aside className="hidden lg:flex w-80 min-h-screen bg-[#071426] border-r border-white/5 sticky top-0 flex-col p-8 font-['Inter',_sans-serif]">
-                <SidebarContent />
+                {renderSidebarContent()}
             </aside>
 
             {/* Mobile Sidebar Overlay */}
@@ -106,7 +106,7 @@ const Sidebar = () => {
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                             className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] bg-[#071426] z-50 p-8 flex flex-col shadow-2xl border-r border-white/5"
                         >
-                            <SidebarContent />
+                            {renderSidebarContent()}
                         </motion.aside>
                     </>
                 )}

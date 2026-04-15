@@ -72,7 +72,7 @@ const BuyPolicy = () => {
     ];
 
     const handlePurchase = async () => {
-        // First open the payment modal to simulate gateway
+        // Open the payment modal to initiate Razorpay checkout
         setIsPaymentModalOpen(true);
     };
 
