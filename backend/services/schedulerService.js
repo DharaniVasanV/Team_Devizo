@@ -15,12 +15,13 @@ const checkDisruptions = async () => {
     console.log('Running disruption check scheduler...');
     try {
         const activePolicies = await Policy.find({ status: 'active' });
+        console.log(`Found ${activePolicies.length} active policies in DB.`);
         
         for (const policy of activePolicies) {
             // In a real app, you would call a Weather API using policy user's city
             // For this demo, we simulate a disruption check
-            const simulatedRain = Math.random() * 100;
-            const simulatedHeat = Math.random() * 50;
+            const simulatedRain = 80; // Forced to 80mm (>50mm threshold) for testing
+            const simulatedHeat = 45; // Forced to 45C (>40C threshold) for testing
             
             let disruptionDetected = false;
             let triggerType = '';
@@ -77,7 +78,11 @@ const checkDisruptions = async () => {
                     claim.status = 'paid';
                     await claim.save();
                     console.log(`Claim lifecycle completed: Claim ${claim._id} marked as 'paid' instantly.`);
+                } else {
+                    console.log(`Skipping payout for ${policy.userId}: A claim has already been filed today.`);
                 }
+            } else {
+                console.log(`No disruptions detected currently for user ${policy.userId}.`);
             }
         }
     } catch (error) {

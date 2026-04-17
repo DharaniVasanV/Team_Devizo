@@ -55,6 +55,15 @@ const calculateRisk = async (req, res) => {
             delivery_hours: Math.random() * 24
         };
 
+        if (!process.env.ML_API_URL) {
+            // Fallback mock response so the frontend doesn't break when ML service is offline
+            return res.json({
+                risk_score: 72,
+                risk_level: 'medium',
+                recommended_premium: 199
+            });
+        }
+
         const { data } = await axios.post(`${process.env.ML_API_URL}/predict-risk`, envData);
         
         res.json({

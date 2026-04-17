@@ -100,7 +100,7 @@ const Login = () => {
 
                 <div className="mt-10 pt-10 border-t border-slate-50 text-center">
                     <p className="text-slate-500 font-medium">
-                        New to GigShield? <Link to="/register" className="text-blue-600 font-bold hover:underline">Create Account</Link>
+                        New to PayProtect? <Link to="/register" className="text-blue-600 font-bold hover:underline">Create Account</Link>
                     </p>
                 </div>
             </motion.div>

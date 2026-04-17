@@ -15,6 +15,7 @@ const BuyPolicy = () => {
     const navigate = useNavigate();
     const { user } = useAuth(); // Assuming 'user' exists in AuthContext
     const [riskData, setRiskData] = useState(null);
+    const [activePolicy, setActivePolicy] = useState(null);
     const dummyPolicyId = [...Array(24)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
     const dummyUserId = "60c72b2f9b1d8b3a0c8e4d1f"; // valid hex fallback
 
@@ -29,7 +30,21 @@ const BuyPolicy = () => {
                 console.error("Failed to fetch risk", err);
             }
         };
+        const fetchPolicy = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/policy/user`, config);
+                if (res.data && res.data.status === 'active') {
+                    setActivePolicy(res.data);
+                    setSelectedPlan(res.data.planType);
+                }
+            } catch (err) {
+                console.log("No active policy found", err);
+            }
+        };
         fetchRisk();
+        fetchPolicy();
     }, []);
 
     const basePremium = riskData?.recommended_premium || 199;
@@ -141,9 +156,11 @@ const BuyPolicy = () => {
                             whileHover={{ y: -10 }}
                             onClick={() => setSelectedPlan(plan.name)}
                             className={`p-10 rounded-[2.8rem] border-2 cursor-pointer transition-all relative ${
-                                selectedPlan === plan.name 
-                                    ? 'border-primary bg-primary/5 shadow-[0_0_50px_rgba(99,102,241,0.1)]' 
-                                    : 'border-white/5 bg-white/5 hover:border-white/20'
+                                activePolicy?.planType === plan.name
+                                    ? 'border-green-500 bg-green-500/5 shadow-[0_0_50px_rgba(34,197,94,0.15)]'
+                                    : selectedPlan === plan.name 
+                                        ? 'border-primary bg-primary/5 shadow-[0_0_50px_rgba(99,102,241,0.1)]' 
+                                        : 'border-white/5 bg-white/5 hover:border-white/20'
                             }`}
                         >
                             {plan.popular && (
@@ -169,9 +186,11 @@ const BuyPolicy = () => {
                             </ul>
 
                             <div className={`w-full py-4 rounded-2xl flex items-center justify-center font-bold transition-all ${
-                                selectedPlan === plan.name ? 'bg-primary text-white' : 'bg-white/5 text-slate-400'
+                                activePolicy?.planType === plan.name
+                                    ? 'bg-green-500 text-white'
+                                    : selectedPlan === plan.name ? 'bg-primary text-white' : 'bg-white/5 text-slate-400'
                             }`}>
-                                {selectedPlan === plan.name ? 'Selected Plan' : 'Select Plan'}
+                                {activePolicy?.planType === plan.name ? 'Current Active Plan' : selectedPlan === plan.name ? 'Selected Plan' : 'Select Plan'}
                             </div>
                         </motion.div>
                     ))}
@@ -185,13 +204,22 @@ const BuyPolicy = () => {
                     </div>
                     <div className="text-center md:text-right flex flex-col items-center md:items-end w-full md:w-auto">
                         <div className="text-4xl md:text-5xl font-black mb-6">₹{plans.find(p => p.name === selectedPlan)?.premium}.00</div>
-                        <button 
-                            onClick={handlePurchase}
-                            disabled={loading}
-                            className="px-8 md:px-12 py-4 md:py-5 bg-primary rounded-2xl md:rounded-3xl text-lg md:text-xl font-bold hover:scale-105 active:scale-95 transition-all w-full md:w-auto disabled:opacity-50 shadow-xl shadow-primary/20"
-                        >
-                            {loading ? "Confirming..." : "Confirm & Subscribe"}
-                        </button>
+                        {activePolicy?.planType === selectedPlan ? (
+                            <button 
+                                disabled
+                                className="px-8 md:px-12 py-4 md:py-5 bg-green-500/20 text-green-400 border border-green-500/50 rounded-2xl md:rounded-3xl text-lg md:text-xl font-bold cursor-not-allowed shadow-xl"
+                            >
+                                Plan Currently Active
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={handlePurchase}
+                                disabled={loading}
+                                className="px-8 md:px-12 py-4 md:py-5 bg-primary rounded-2xl md:rounded-3xl text-lg md:text-xl font-bold hover:scale-105 active:scale-95 transition-all w-full md:w-auto disabled:opacity-50 shadow-xl shadow-primary/20"
+                            >
+                                {loading ? "Confirming..." : "Confirm & Subscribe"}
+                            </button>
+                        )}
                     </div>
                 </div>
             </main>
