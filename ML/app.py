@@ -25,30 +25,31 @@ async def custom_swagger_ui():
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
     <style>
         body {{
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: #ffffff;
             font-family: 'Inter', sans-serif;
         }}
         .topbar {{
-            background-color: #020617 !important;
+            background-color: #0b1f3a !important; /* PayProtect theme dark blue for header */
         }}
         .swagger-ui .info hgroup.main h2 {{
-            color: #38bdf8;
+            color: #2563eb; /* Deeper blue for contrast on white */
             font-size: 30px;
             font-weight: bold;
         }}
         .swagger-ui .btn.execute {{
             background-color: #2563eb;
+            color: white;
             border-radius: 10px;
             font-weight: bold;
         }}
         .swagger-ui .opblock-tag {{
-            color: #22c55e;
+            color: #16a34a; /* Darker green for contrast on white */
             font-weight: bold;
             font-size: 16px;
         }}
         .swagger-ui .opblock {{
             border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Softer shadow for white theme */
             margin-bottom: 12px;
         }}
         .swagger-ui .opblock-summary-method {{
