@@ -56,6 +56,8 @@ const getTransactions = async (req, res) => {
 const simulateDisasterPayout = async (req, res) => {
     try {
         const userId = req.user.id;
+        const user = await require('../models/User').findById(userId);
+        const city = user?.city || 'Chennai';
         
         // 1. Fetch active policy
         const activePolicy = await Policy.findOne({ userId, status: 'active' });
@@ -63,25 +65,37 @@ const simulateDisasterPayout = async (req, res) => {
             return res.status(400).json({ message: 'No active policy found to process payout.' });
         }
 
-        // 2. Determine environment data
-        const envData = {
-            rainfall: Math.random() * 100,
-            temperature: Math.random() * 45,
-            aqi: Math.random() * 300,
-            delivery_hours: Math.random() * 24
-        };
+        // 2. Fetch live environmental data from OpenWeatherAPI
+        const { getWeatherData } = require('../services/weatherService');
+        let envData = await getWeatherData(city);
+        
+        if (!envData) {
+            console.log('Using fallback default safe values due to Weather API failure.');
+            envData = {
+                rainfall: 0,
+                temperature: 30,
+                aqi: 50,
+                delivery_hours: 6
+            };
+        }
 
-        // 3. Call ML API for Payout logic
-        let risk_level = "high";
-        let recommended_payout = 300; // Mock fallback
+        console.log(`Live weather fetched for ${city}`);
+        console.log(`Rainfall: ${envData.rainfall} mm, AQI: ${envData.aqi}`);
+
+        // 3. Call ML API for Parametric Insurance logic
+        let risk_level = "low";
+        let recommended_payout = 0; // Fallback mock 0
         
         if (process.env.ML_API_URL) {
             const mlResponse = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
-            if (mlResponse.data && mlResponse.data.recommended_payout) {
+            if (mlResponse.data && mlResponse.data.recommended_payout !== undefined) {
                 risk_level = mlResponse.data.risk_level;
                 recommended_payout = mlResponse.data.recommended_payout;
+                console.log(`ML predicted risk: ${risk_level.toUpperCase()}`);
             }
         }
+        
+        console.log(`₹${recommended_payout} payout processed`);
 
         // Check for existing claim today to prevent abuse
         const today = new Date();
