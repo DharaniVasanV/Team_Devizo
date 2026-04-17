@@ -32,18 +32,25 @@ const Dashboard = () => {
     // ── Fraud simulation demo state ─────────────────────────────
     const [fraudLoading, setFraudLoading] = useState(null); // 'GPS_SPOOFING' | 'FAKE_WEATHER' | null
     const [fraudResult, setFraudResult] = useState(null);
+    const [payoutResult, setPayoutResult] = useState(null);
+    const [loadingPayout, setLoadingPayout] = useState(false);
+    const [weather, setWeather] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [policyRes, claimsRes, transRes] = await Promise.all([
+                const [policyRes, claimsRes, transRes, weatherRes] = await Promise.all([
                     axios.get(`${import.meta.env.VITE_API_URL}/api/policy/user`),
                     axios.get(`${import.meta.env.VITE_API_URL}/api/claims`),
-                    axios.get(`${import.meta.env.VITE_API_URL}/api/payout/transactions`)
+                    axios.get(`${import.meta.env.VITE_API_URL}/api/payout/transactions`),
+                    axios.get(`${import.meta.env.VITE_API_URL}/api/weather/current`).catch(() => ({ data: null })) // Allow gracefully failing weather
                 ]);
 
                 setPolicy(policyRes.data);
                 setClaims(claimsRes.data);
+                if (weatherRes && weatherRes.data) {
+                    setWeather(weatherRes.data);
+                }
                 
                 // Calculate stats
                 const paidClaims = claimsRes.data.filter(c => c.status === 'paid');
@@ -86,6 +93,32 @@ const Dashboard = () => {
             setFraudResult({ error: err.response?.data?.message || 'Simulation failed.' });
         } finally {
             setFraudLoading(null);
+        }
+    };
+
+    const handlePayoutSimulation = async () => {
+        if (!policy) {
+            setPayoutResult({ error: 'You need an active policy first to run the simulation.' });
+            return;
+        }
+        setLoadingPayout(true);
+        setPayoutResult(null);
+        try {
+            const token = localStorage.getItem('token');
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/payout/process-payout`,
+                { policyId: policy._id },
+                config
+            );
+            setPayoutResult(res.data);
+            // Refresh claims list
+            const claimsRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/claims`, config);
+            setClaims(claimsRes.data);
+        } catch (err) {
+            setPayoutResult({ error: err.response?.data?.message || 'Payout simulation failed.' });
+        } finally {
+            setLoadingPayout(false);
         }
     };
 
@@ -171,19 +204,37 @@ const Dashboard = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-4">
-                                            <div className="text-slate-400 text-sm font-bold">Covered Thresholds</div>
+                                            <div className="text-slate-400 text-sm font-bold flex justify-between">
+                                                <span>Live Weather Data</span>
+                                                <span className="text-blue-400">{weather?.city || 'Fetching Area...'}</span>
+                                            </div>
                                             <div className="space-y-3">
                                                 <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl text-sm border border-white/5">
-                                                    <span className="flex items-center gap-2 text-blue-400"><CloudRain size={16}/> Heavy Rain</span>
-                                                    <span className="font-bold text-slate-300">50mm / hr</span>
+                                                    <span className="flex items-center gap-2 text-blue-400"><CloudRain size={16}/> Rainfall</span>
+                                                    <div className="text-right flex items-center gap-3">
+                                                        <div className="text-xs text-slate-500 hidden md:block">Limit: 50mm/hr</div>
+                                                        <div className={`font-bold px-3 py-1 rounded-full text-xs uppercase tracking-widest ${weather?.rainfall >= 50 ? 'bg-red-500/20 text-red-500' : weather?.rainfall > 20 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-400'}`}>
+                                                            {weather ? `${weather.rainfall} mm` : '...'}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl text-sm border border-white/5">
-                                                    <span className="flex items-center gap-2 text-yellow-500"><ThermometerSun size={16}/> Extreme Heat</span>
-                                                    <span className="font-bold text-slate-300">40°C</span>
+                                                    <span className="flex items-center gap-2 text-yellow-500"><ThermometerSun size={16}/> Temperature</span>
+                                                    <div className="text-right flex items-center gap-3">
+                                                        <div className="text-xs text-slate-500 hidden md:block">Limit: 40°C</div>
+                                                        <div className={`font-bold px-3 py-1 rounded-full text-xs uppercase tracking-widest ${weather?.temperature >= 40 ? 'bg-red-500/20 text-red-500' : weather?.temperature > 35 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-400'}`}>
+                                                            {weather ? `${weather.temperature}°C` : '...'}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl text-sm border border-white/5">
-                                                    <span className="flex items-center gap-2 text-purple-400"><Wind size={16}/> Severe AQI</span>
-                                                    <span className="font-bold text-slate-300">300+</span>
+                                                    <span className="flex items-center gap-2 text-purple-400"><Wind size={16}/> AQI Level</span>
+                                                    <div className="text-right flex items-center gap-3">
+                                                        <div className="text-xs text-slate-500 hidden md:block">Limit: 300+</div>
+                                                        <div className={`font-bold px-3 py-1 rounded-full text-xs uppercase tracking-widest ${weather?.aqi >= 300 ? 'bg-red-500/20 text-red-500' : weather?.aqi > 150 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-400'}`}>
+                                                            {weather ? `${weather.aqi} AQI` : '...'}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -260,6 +311,20 @@ const Dashboard = () => {
                             <p className="text-slate-500 text-xs mb-4">Trigger a fake claim to see the AI fraud detection in action.</p>
 
                             <div className="flex flex-col gap-3">
+                                {/* Simulate Disaster - Auto Payout */}
+                                <motion.button
+                                    id="btn-simulate-disaster"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={() => handlePayoutSimulation()}
+                                    disabled={!!fraudLoading || loadingPayout}
+                                    className="flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-sm font-bold text-red-500 hover:bg-red-500/20 transition-all disabled:opacity-50"
+                                >
+                                    {loadingPayout 
+                                        ? <Loader2 size={16} className="animate-spin" />
+                                        : <AlertTriangle size={16} />}
+                                    Simulate Disaster (Auto Payout)
+                                </motion.button>
                                 {/* GPS Spoofing Button */}
                                 <motion.button
                                     id="btn-simulate-gps-fraud"
@@ -327,6 +392,41 @@ const Dashboard = () => {
                                                     Ground Truth — Rain: {fraudResult.fraudSummary?.groundTruth?.rainfall?.toFixed(1)}mm |
                                                     Temp: {fraudResult.fraudSummary?.groundTruth?.temperature?.toFixed(1)}°C |
                                                     AQI: {fraudResult.fraudSummary?.groundTruth?.aqi?.toFixed(0)}
+                                                </div>
+                                            </>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            
+                            {/* Payout Result Banner */}
+                            <AnimatePresence>
+                                {payoutResult && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0 }}
+                                        className={`mt-4 p-4 rounded-xl text-xs font-mono leading-relaxed ${
+                                            payoutResult.error
+                                                ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+                                                : 'bg-green-500/10 border border-green-500/20 text-green-300'
+                                        }`}
+                                    >
+                                        {payoutResult.error ? (
+                                            <span>⚠️ {payoutResult.error}</span>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-2 mb-2 font-bold text-sm">
+                                                    <CheckCircle2 size={16} className="text-green-400" /> Payout Processed Successfully!
+                                                </div>
+                                                <div className="mb-1">
+                                                    <span className="opacity-60">[CLAIM_ID]</span> {payoutResult.claimId || 'N/A'}
+                                                </div>
+                                                <div className="mb-1">
+                                                    <span className="opacity-60">[AMOUNT]</span> ₹{payoutResult.payoutAmount || 0}
+                                                </div>
+                                                <div className="mt-2 opacity-50">
+                                                    {payoutResult.message || 'Auto payout completed out against parametric policy.'}
                                                 </div>
                                             </>
                                         )}
