@@ -69,7 +69,7 @@ const calculateRisk = async (req, res) => {
         res.json({
             risk_score: data.risk_score,
             risk_level: data.risk_level,
-            recommended_premium: data.recommended_premium
+            recommended_premium: data.recommended_payout
         });
     } catch (error) {
         console.error('Error calculating risk:', error.message);

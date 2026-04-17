@@ -144,18 +144,18 @@ def payout_simulation(data: RiskData):
         
         if risk_score < 0.3:
             risk_level = "low"
-            premium = 100
+            payout = 100
         elif risk_score < 0.7:
             risk_level = "medium"
-            premium = 200
+            payout = 200
         else:
             risk_level = "high"
-            premium = 300
+            payout = 300
             
         return {
             "risk_score": round(risk_score, 3),
             "risk_level": risk_level,
-            "recommended_premium": premium
+            "recommended_payout": payout
         }
     except Exception as e:
         return {"error": str(e)}

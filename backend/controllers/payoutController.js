@@ -1,5 +1,7 @@
 const Transaction = require('../models/Transaction');
 const Claim = require('../models/Claim');
+const Policy = require('../models/Policy');
+const axios = require('axios');
 
 const processPayout = async (req, res) => {
     try {
@@ -51,4 +53,84 @@ const getTransactions = async (req, res) => {
     }
 };
 
-module.exports = { processPayout, getTransactions };
+const simulateDisasterPayout = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        // 1. Fetch active policy
+        const activePolicy = await Policy.findOne({ userId, status: 'active' });
+        if (!activePolicy) {
+            return res.status(400).json({ message: 'No active policy found to process payout.' });
+        }
+
+        // 2. Determine environment data
+        const envData = {
+            rainfall: Math.random() * 100,
+            temperature: Math.random() * 45,
+            aqi: Math.random() * 300,
+            delivery_hours: Math.random() * 24
+        };
+
+        // 3. Call ML API for Payout logic
+        let risk_level = "high";
+        let recommended_payout = 300; // Mock fallback
+        
+        if (process.env.ML_API_URL) {
+            const mlResponse = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
+            if (mlResponse.data && mlResponse.data.recommended_payout) {
+                risk_level = mlResponse.data.risk_level;
+                recommended_payout = mlResponse.data.recommended_payout;
+            }
+        }
+
+        // Check for existing claim today to prevent abuse
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const existingClaim = await Claim.findOne({
+            policyId: activePolicy._id,
+            createdAt: { $gte: today }
+        });
+        if (existingClaim) {
+            return res.status(400).json({ message: 'A payout has already been processed today.' });
+        }
+
+        // 4. Create Claim (Status: Approved)
+        const claim = new Claim({
+            policyId: activePolicy._id,
+            userId,
+            triggerType: 'Heavy Rain',
+            claimAmount: recommended_payout,
+            status: 'approved',
+            disruptionDetails: { risk_level, envData }
+        });
+        await claim.save();
+
+        // 5. Create Transaction (Status: Success)
+        const transaction = new Transaction({
+            userId,
+            claimId: claim._id,
+            policyId: activePolicy._id,
+            type: 'claim_payout',
+            amount: recommended_payout,
+            status: 'success',
+            paymentStatus: 'completed'
+        });
+        await transaction.save();
+
+        // 6. Update Claim to Paid
+        claim.status = 'paid';
+        await claim.save();
+
+        return res.status(200).json({
+            message: "Payout processed successfully",
+            payout: recommended_payout,
+            risk_level
+        });
+
+    } catch (error) {
+        console.error("Payout processing error:", error.message);
+        return res.status(500).json({ message: 'Error processing automated payout flow' });
+    }
+};
+
+module.exports = { processPayout, getTransactions, simulateDisasterPayout };

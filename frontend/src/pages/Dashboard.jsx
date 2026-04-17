@@ -32,6 +32,8 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [earningsData, setEarningsData] = useState(null);
     const [earningsLoading, setEarningsLoading] = useState(false);
+    const [isSimulating, setIsSimulating] = useState(false);
+    const [simMessage, setSimMessage] = useState(null);
     const dashboardRef = useRef(null);
 
     useEffect(() => {
@@ -61,6 +63,38 @@ const Dashboard = () => {
 
         fetchData();
     }, []);
+
+    const handleSimulateDisaster = async () => {
+        setIsSimulating(true);
+        setSimMessage(null);
+        try {
+            const token = localStorage.getItem('token');
+            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/payout/process-payout`, {}, config);
+            
+            setSimMessage(`💰 ₹${res.data.payout} credited successfully! (Risk: ${res.data.risk_level})`);
+            
+            // Re-fetch dashboard claims/policy data instantly
+            const [policyRes, claimsRes, transRes] = await Promise.all([
+                axios.get(`${import.meta.env.VITE_API_URL}/api/policy/user`, config),
+                axios.get(`${import.meta.env.VITE_API_URL}/api/claims`, config),
+                axios.get(`${import.meta.env.VITE_API_URL}/api/payout/transactions`, config)
+            ]);
+            setPolicy(policyRes.data);
+            setClaims(claimsRes.data);
+            const paidClaims = claimsRes.data.filter(c => c.status === 'paid');
+            setStats({
+                protected: claimsRes.data.length,
+                claimsTriggered: claimsRes.data.length,
+                earningsCovered: paidClaims.reduce((sum, c) => sum + c.claimAmount, 0)
+            });
+        } catch (error) {
+            setSimMessage(error.response?.data?.message || "Error simulating disaster payout.");
+        } finally {
+            setIsSimulating(false);
+            setTimeout(() => setSimMessage(null), 6000);
+        }
+    };
 
     // Fetch earnings from Swiggy API if user is verified
     useEffect(() => {
@@ -339,6 +373,41 @@ const Dashboard = () => {
                             <BellRing className="text-accent" size={24} /> System Alerts
                         </h2>
                         <div className="space-y-4">
+                            
+                            {/* ML Demo Simulation Card */}
+                            <div className="p-6 bg-purple-500/10 border border-purple-500/20 rounded-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <Zap className="text-purple-500 shrink-0" size={24} />
+                                        <div>
+                                            <div className="font-bold mb-1">AI Payout Integration DEMO</div>
+                                            <p className="text-sm text-slate-400">Force trigger the Parametric ML flow. Auto-calculates payout and credits instantly.</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={handleSimulateDisaster}
+                                        disabled={isSimulating}
+                                        className="w-full mt-2 py-3 bg-purple-600 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-purple-500 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-purple-600/20 disabled:opacity-50"
+                                    >
+                                        {isSimulating ? "Processing Parametric Claim..." : "Simulate Disaster ⚡"}
+                                    </button>
+                                    {simMessage && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`text-sm font-bold text-center p-3 rounded-xl border ${
+                                                simMessage.includes('cred') 
+                                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                                    : 'bg-red-500/20 text-red-400 border-red-500/30'
+                                            }`}
+                                        >
+                                            {simMessage}
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* Swiggy Verification Alert */}
                             {user?.platform === 'Swiggy' && !isSwiggyVerified && (
                                 <div className="p-6 bg-orange-500/10 border border-orange-500/20 rounded-2xl relative overflow-hidden">
