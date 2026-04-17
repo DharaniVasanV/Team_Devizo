@@ -5,10 +5,12 @@ const Claim = require('../models/Claim');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 
+const { getWeatherData } = require('./weatherService');
+
 const disruptionThresholds = {
     rain: 50, // mm
     heat: 40, // celsius
-    pollution: 300 // AQI
+    pollution: 200 // AQI
 };
 
 const checkDisruptions = async () => {
@@ -18,26 +20,51 @@ const checkDisruptions = async () => {
         console.log(`Found ${activePolicies.length} active policies in DB.`);
         
         for (const policy of activePolicies) {
-            // In a real app, you would call a Weather API using policy user's city
-            // For this demo, we simulate a disruption check
-            const simulatedRain = 80; // Forced to 80mm (>50mm threshold) for testing
-            const simulatedHeat = 45; // Forced to 45C (>40C threshold) for testing
+            const user = await User.findById(policy.userId);
+            if (!user) continue;
+
+            const city = user.city || 'Chennai';
+            console.log(`Checking city: ${city}`);
             
-            let disruptionDetected = false;
-            let triggerType = '';
-            let disruptionValue = 0;
-
-            if (simulatedRain > disruptionThresholds.rain) {
-                disruptionDetected = true;
-                triggerType = 'Heavy Rain';
-                disruptionValue = simulatedRain.toFixed(1) + 'mm';
-            } else if (simulatedHeat > disruptionThresholds.heat) {
-                disruptionDetected = true;
-                triggerType = 'Extreme Heat';
-                disruptionValue = simulatedHeat.toFixed(1) + '°C';
+            let envData = await getWeatherData(user);
+            if (!envData) {
+                console.log('Using fallback default safe values due to Weather API failure.');
+                envData = {
+                    rainfall: 0,
+                    temperature: 30,
+                    aqi: 50,
+                    delivery_hours: user?.avgDeliveryHours || 6,
+                    city: city
+                };
             }
+            
+            console.log(`Rainfall: ${envData.rainfall}, AQI: ${envData.aqi}`);
 
-            if (disruptionDetected) {
+            let risk_level = "low";
+            let recommended_payout = 0;
+
+            if (process.env.ML_API_URL) {
+                try {
+                    const mlResponse = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
+                    if (mlResponse.data && mlResponse.data.recommended_payout !== undefined) {
+                        risk_level = mlResponse.data.risk_level;
+                        recommended_payout = mlResponse.data.recommended_payout;
+                    }
+                } catch (mlErr) {
+                    console.error("ML Error:", mlErr.message);
+                }
+            }
+            
+            console.log(`Risk predicted: ${risk_level.toUpperCase()}`);
+
+            if (risk_level === 'high') {
+                let triggerType = 'Normal';
+                if (envData.rainfall > disruptionThresholds.rain) triggerType = 'Heavy Rain';
+                else if (envData.temperature > disruptionThresholds.heat) triggerType = 'Extreme Heat';
+                else if (envData.aqi > disruptionThresholds.pollution) triggerType = 'Severe Pollution';
+                
+                if (triggerType === 'Normal') triggerType = 'High Risk Event';
+
                 // Check if a claim already exists for this policy and today
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -48,14 +75,15 @@ const checkDisruptions = async () => {
                 });
 
                 if (!existingClaim) {
+                    console.log(`Payout triggered: ₹${recommended_payout}`);
+                    
                     // 1. Create claim as approved
-                    const claimAmount = 500; // Fixed payout for disruption for demo
                     const claim = new Claim({
                         policyId: policy._id,
                         userId: policy.userId,
                         triggerType,
-                        claimAmount,
-                        disruptionDetails: { value: disruptionValue, threshold: disruptionThresholds },
+                        claimAmount: recommended_payout,
+                        disruptionDetails: { risk_level, envData },
                         status: 'approved'
                     });
                     await claim.save();
@@ -66,13 +94,13 @@ const checkDisruptions = async () => {
                         userId: policy.userId,
                         claimId: claim._id,
                         policyId: policy._id,
-                        type: 'claim_payout', // Using 'claim_payout' as per Transaction schema enum
-                        amount: claimAmount,
+                        type: 'claim_payout', 
+                        amount: recommended_payout,
                         status: 'success',
                         paymentStatus: 'completed'
                     });
                     await transaction.save();
-                    console.log(`Payout transaction processed for claim ${claim._id}. Amount distributed: ₹${claimAmount}`);
+                    console.log(`Payout transaction processed for claim ${claim._id}. Amount distributed: ₹${recommended_payout}`);
 
                     // 3. Update claim status to paid
                     claim.status = 'paid';
@@ -82,7 +110,7 @@ const checkDisruptions = async () => {
                     console.log(`Skipping payout for ${policy.userId}: A claim has already been filed today.`);
                 }
             } else {
-                console.log(`No disruptions detected currently for user ${policy.userId}.`);
+                console.log(`No disruptions detected currently for user ${policy.userId}. Risk level is ${risk_level}.`);
             }
         }
     } catch (error) {

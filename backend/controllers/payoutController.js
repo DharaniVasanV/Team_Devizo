@@ -57,7 +57,6 @@ const simulateDisasterPayout = async (req, res) => {
     try {
         const userId = req.user.id;
         const user = await require('../models/User').findById(userId);
-        const city = user?.city || 'Chennai';
         
         // 1. Fetch active policy
         const activePolicy = await Policy.findOne({ userId, status: 'active' });
@@ -67,7 +66,7 @@ const simulateDisasterPayout = async (req, res) => {
 
         // 2. Fetch live environmental data from OpenWeatherAPI
         const { getWeatherData } = require('../services/weatherService');
-        let envData = await getWeatherData(city);
+        let envData = await getWeatherData(user);
         
         if (!envData) {
             console.log('Using fallback default safe values due to Weather API failure.');
@@ -75,12 +74,19 @@ const simulateDisasterPayout = async (req, res) => {
                 rainfall: 0,
                 temperature: 30,
                 aqi: 50,
-                delivery_hours: 6
+                delivery_hours: user?.avgDeliveryHours || 6,
+                city: user?.city || 'Chennai'
             };
         }
 
-        console.log(`Live weather fetched for ${city}`);
+        console.log(`Live weather fetched for ${envData.city}`);
         console.log(`Rainfall: ${envData.rainfall} mm, AQI: ${envData.aqi}`);
+
+        // Determine dynamic triggerType
+        let triggerType = 'Normal';
+        if (envData.rainfall > 50) triggerType = 'Heavy Rain';
+        else if (envData.temperature > 40) triggerType = 'Extreme Heat';
+        else if (envData.aqi > 200) triggerType = 'Severe Pollution';
 
         // 3. Call ML API for Parametric Insurance logic
         let risk_level = "low";
@@ -112,7 +118,7 @@ const simulateDisasterPayout = async (req, res) => {
         const claim = new Claim({
             policyId: activePolicy._id,
             userId,
-            triggerType: 'Heavy Rain',
+            triggerType,
             claimAmount: recommended_payout,
             status: 'approved',
             disruptionDetails: { risk_level, envData }

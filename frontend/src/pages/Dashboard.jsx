@@ -34,6 +34,8 @@ const Dashboard = () => {
     const [earningsLoading, setEarningsLoading] = useState(false);
     const [isSimulating, setIsSimulating] = useState(false);
     const [simMessage, setSimMessage] = useState(null);
+    const [weatherData, setWeatherData] = useState(null);
+    const [weatherError, setWeatherError] = useState(false);
     const dashboardRef = useRef(null);
 
     useEffect(() => {
@@ -62,6 +64,26 @@ const Dashboard = () => {
         };
 
         fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/weather/current`, config);
+                setWeatherData(res.data);
+                setWeatherError(false);
+            } catch (error) {
+                console.error("Failed to fetch weather data", error);
+                setWeatherError(true);
+            }
+        };
+
+        fetchWeather();
+        // Optional: Poll every 5 minutes
+        const intervalId = setInterval(fetchWeather, 5 * 60 * 1000);
+        return () => clearInterval(intervalId);
     }, []);
 
     const handleSimulateDisaster = async () => {
@@ -304,8 +326,51 @@ const Dashboard = () => {
                                                 </div>
                                                 <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl text-sm border border-white/5">
                                                     <span className="flex items-center gap-2 text-purple-400"><Wind size={16}/> Severe AQI</span>
-                                                    <span className="font-bold text-slate-300">300+</span>
+                                                    <span className="font-bold text-slate-300">200+</span>
                                                 </div>
+                                            </div>
+
+                                            <div className="mt-6 pt-4 border-t border-white/10">
+                                                <div className="text-slate-400 text-sm font-bold mb-3 flex justify-between items-center">
+                                                    <span>Live Conditions</span>
+                                                    {weatherData && <span className="text-xs font-normal text-slate-500 flex items-center gap-1"><MapPin size={12}/> {weatherData.city}</span>}
+                                                </div>
+                                                
+                                                {weatherError ? (
+                                                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400 text-center">
+                                                        Weather data unavailable
+                                                    </div>
+                                                ) : !weatherData ? (
+                                                    <div className="p-4 bg-white/5 border border-white/5 rounded-xl text-sm text-slate-400 text-center animate-pulse">
+                                                        Fetching live data...
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-white/5 rounded-xl p-4 mt-4 border border-white/10 space-y-4">
+                                                        <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                                                            <div className="flex flex-col items-center justify-center p-2 bg-black/20 rounded-lg">
+                                                                <span className="text-blue-400 mb-1 text-lg">🌧️</span>
+                                                                <span className="font-bold text-white text-xs">{weatherData.rainfall} mm</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-center justify-center p-2 bg-black/20 rounded-lg">
+                                                                <span className="text-yellow-500 mb-1 text-lg">🌡️</span>
+                                                                <span className="font-bold text-white text-xs">{weatherData.temperature}°C</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-center justify-center p-2 bg-black/20 rounded-lg">
+                                                                <span className="text-purple-400 mb-1 text-lg">🌫️</span>
+                                                                <span className="font-bold text-white text-xs">{weatherData.aqi} AQI</span>
+                                                            </div>
+                                                        </div>
+                                                        {weatherData.rainfall > 50 ? (
+                                                            <div className="w-full text-center py-2 text-xs font-bold rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">⚠️ High Rain Risk</div>
+                                                        ) : weatherData.temperature > 40 ? (
+                                                            <div className="w-full text-center py-2 text-xs font-bold rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">🔥 Heat Risk</div>
+                                                        ) : weatherData.aqi > 200 ? (
+                                                            <div className="w-full text-center py-2 text-xs font-bold rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30">☣️ Pollution Risk</div>
+                                                        ) : (
+                                                            <div className="w-full text-center py-2 text-xs font-bold rounded-lg bg-green-500/10 text-green-400 border border-green-500/20">✅ Normal Conditions</div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
