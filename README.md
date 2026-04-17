@@ -9,6 +9,9 @@ The traditional insurance system cannot protect gig workers in these situations.
 
 **PayProtect** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, automated triggers, and fraud detection* to create a **fast, transparent, and secure system**.
 
+### Project Presentation
+https://drive.google.com/file/d/1TxgPWfWnW9Hllyzstz3cDR-g2FF4toK3/view?usp=sharing
+
 ---
 
 # 2. Platform Simulation: Delivery Ecosystem Integration
