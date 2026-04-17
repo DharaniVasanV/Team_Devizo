@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
 import { 
     CloudRain, 
     Shield, 
@@ -37,6 +38,10 @@ const Dashboard = () => {
     const [weatherData, setWeatherData] = useState(null);
     const [weatherError, setWeatherError] = useState(false);
     const dashboardRef = useRef(null);
+
+    if (user?.role === 'admin') {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
 
     useEffect(() => {
         const fetchData = async () => {

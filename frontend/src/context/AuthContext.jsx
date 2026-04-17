@@ -11,29 +11,46 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
+        const syncCurrentUser = async () => {
+            if (!token) {
+                delete axios.defaults.headers.common['Authorization'];
+                setUser(null);
+                setLoading(false);
+                return;
             }
-        } else {
-            delete axios.defaults.headers.common['Authorization'];
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`);
+                const freshUser = res.data.user;
+                localStorage.setItem('user', JSON.stringify(freshUser));
+                setUser(freshUser);
+            } catch (error) {
+                console.error('Error syncing current user:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                delete axios.defaults.headers.common['Authorization'];
+                setToken(null);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
         }
-        setLoading(false);
+
+        syncCurrentUser();
     }, [token]);
 
     const login = async (phone, password) => {
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, { phone, password });
             const { token, user, swiggyVerification } = res.data;
-            // Merge swiggy verification into user object
             const enrichedUser = { ...user, swiggyVerification };
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(enrichedUser));
             setToken(token);
             setUser(enrichedUser);
-            return { success: true, swiggyVerification };
+            return { success: true, swiggyVerification, user: enrichedUser };
         } catch (error) {
             return { success: false, message: error.response?.data?.message || 'Login failed' };
         }
@@ -48,7 +65,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user', JSON.stringify(enrichedUser));
             setToken(token);
             setUser(enrichedUser);
-            return { success: true, swiggyVerification };
+            return { success: true, swiggyVerification, user: enrichedUser };
         } catch (error) {
             return { success: false, message: error.response?.data?.message || 'Registration failed' };
         }

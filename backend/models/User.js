@@ -4,6 +4,7 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
     phone: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
+    role: { type: String, enum: ['worker', 'admin'], default: 'worker' },
     platform: { type: String, enum: ['Zomato', 'Swiggy', 'Amazon', 'Zepto', 'Other'], required: true },
     city: { type: String, required: true },
     // Swiggy verification fields

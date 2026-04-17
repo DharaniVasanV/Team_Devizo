@@ -153,10 +153,13 @@ const getWorkerWeeklyEarnings = async (workerId) => {
             });
         }
 
+        const sevenDayTotalEarnings = result.reduce((sum, day) => sum + (day.income || 0), 0);
+        const sevenDayTotalOrders = result.reduce((sum, day) => sum + (day.orders || 0), 0);
+
         return {
             daily: result,
-            totalEarnings: workerEarnings.reduce((sum, e) => sum + (e.total_earning || e.base_earning || 0), 0),
-            totalOrders: workerEarnings.length,
+            totalEarnings: sevenDayTotalEarnings,
+            totalOrders: sevenDayTotalOrders,
             earningsRecords: workerEarnings
         };
     } catch (error) {

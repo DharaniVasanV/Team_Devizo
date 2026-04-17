@@ -3,6 +3,19 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const swiggyService = require('../services/swiggyService');
 
+const serializeUser = (user) => ({
+    id: user._id,
+    name: user.name,
+    phone: user.phone,
+    role: user.role,
+    platform: user.platform,
+    city: user.city,
+    isSwiggyVerified: user.isSwiggyVerified,
+    swiggyCwid: user.swiggyCwid,
+    workerZone: user.workerZone,
+    zoneVerified: user.zoneVerified
+});
+
 const register = async (req, res) => {
     try {
         const { name, phone, password, platform, city } = req.body;
@@ -22,6 +35,7 @@ const register = async (req, res) => {
             name,
             phone,
             password: hashedPassword,
+            role: 'worker',
             platform,
             city
         });
@@ -73,17 +87,7 @@ const register = async (req, res) => {
 
         res.status(201).json({
             token,
-            user: {
-                id: user._id,
-                name: user.name,
-                phone: user.phone,
-                platform: user.platform,
-                city: user.city,
-                isSwiggyVerified: user.isSwiggyVerified,
-                swiggyCwid: user.swiggyCwid,
-                workerZone: user.workerZone,
-                zoneVerified: user.zoneVerified
-            },
+            user: serializeUser(user),
             swiggyVerification
         });
     } catch (error) {
@@ -140,17 +144,7 @@ const login = async (req, res) => {
 
         res.json({
             token,
-            user: {
-                id: user._id,
-                name: user.name,
-                phone: user.phone,
-                platform: user.platform,
-                city: user.city,
-                isSwiggyVerified: user.isSwiggyVerified,
-                swiggyCwid: user.swiggyCwid,
-                workerZone: user.workerZone,
-                zoneVerified: user.zoneVerified
-            },
+            user: serializeUser(user),
             swiggyVerification
         });
     } catch (error) {
@@ -159,4 +153,19 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ user: serializeUser(user) });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error fetching current user' });
+    }
+};
+
+module.exports = { register, login, getCurrentUser };

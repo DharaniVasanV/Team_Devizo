@@ -21,7 +21,7 @@ const Login = () => {
         const result = await login(formData.phone, formData.password);
         setLoading(false);
         if (result.success) {
-            navigate('/dashboard');
+            navigate(result.user?.role === 'admin' ? '/admin/dashboard' : '/dashboard');
         } else {
             setError(result.message);
         }

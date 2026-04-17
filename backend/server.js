@@ -29,6 +29,7 @@ app.use('/api/payout', require('./routes/payoutRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/worker', require('./routes/workerRoutes'));
 app.use('/api/weather', require('./routes/weatherRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Database Connection
 connectDB().then(() => {
