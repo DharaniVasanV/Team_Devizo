@@ -1,4 +1,4 @@
-# GigGuard AI
+# PayProtect
 ### AI-Powered Parametric Insurance Platform for Gig Workers
 
 # 1. Introduction
@@ -7,7 +7,7 @@ For example, gig economy workers like **delivery partners** need to earn their d
 
 The traditional insurance system cannot protect gig workers in these situations. Insurance policies are designed to be **long-term contracts** that are intricate in nature. They often require **manual verification processes** that are cumbersome for gig workers to access.
 
-**GigGuard** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, automated triggers, and fraud detection* to create a **fast, transparent, and secure system**.
+**PayProtect** aims to resolve this issue through a *parametric insurance platform* that can protect gig workers from losing their daily earnings due to disruptions in environmental or social situations. It uses a combination of *machine learning, automated triggers, and fraud detection* to create a **fast, transparent, and secure system**.
 
 ---
 
@@ -56,7 +56,7 @@ Rahul is a delivery partner working in an **urban city**. He earns based on the 
 
 Rahul might stop working during **heavy rainfalls** or **extreme heat wave conditions**. In the same way, he might not be able to make deliveries during **severe traffic congestion** or due to **road blockages**.
 
-Rahul can buy a *weekly micro-insurance policy* through **GigGuard**.
+Rahul can buy a *weekly micro-insurance policy* through **PayProtect**.
 
 ### Scenario Workflow
 
@@ -144,7 +144,7 @@ Subsequently, the **insurance payment** will then be determined as a **percentag
 
 # 6. Parametric Trigger System
 
-Unlike conventional insurance, where claims have to be filed, **GigGuard utilizes parametric triggers**.
+Unlike conventional insurance, where claims have to be filed, **PayProtect utilizes parametric triggers**.
 
 **Parametric Insurance:**  
 Parametric insurance is activated **as soon as disruption conditions occur**.
@@ -390,6 +390,6 @@ This will help in transforming the platform into a **deployable insurance soluti
 
 # Conclusion
 
-**GigGuard** is a great example of how **parametric insurance, machine learning, and real-time disruption detection** can be leveraged to develop an effective income protection solution for gig workers.
+**PayProtect** is a great example of how **parametric insurance, machine learning, and real-time disruption detection** can be leveraged to develop an effective income protection solution for gig workers.
 
 With the use of **environmental data**, **social disruptions**, and **strong fraud detection capabilities**, a **scalable and secure insurance solution** for the gig workforce is achieved.
