@@ -3,6 +3,7 @@ const axios = require('axios');
 const Policy = require('../models/Policy');
 const Claim = require('../models/Claim');
 const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 
 const disruptionThresholds = {
     rain: 50, // mm
@@ -46,39 +47,36 @@ const checkDisruptions = async () => {
                 });
 
                 if (!existingClaim) {
-                    
-                    let claimStatus = 'approved';
-                    const simulatedAqi = Math.random() * 500;
-                    const simulatedDeliveryHours = Math.random() * 24;
-
-                    try {
-                        const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, {
-                            rainfall: simulatedRain,
-                            temperature: simulatedHeat,
-                            aqi: simulatedAqi,
-                            delivery_hours: simulatedDeliveryHours
-                        });
-
-                        if (mlResponse.data && mlResponse.data.prediction === -1) {
-                            claimStatus = 'fraud suspected';
-                        } else if (mlResponse.data && mlResponse.data.prediction === 1) {
-                            claimStatus = 'approved';
-                        }
-                    } catch (mlError) {
-                        console.error('ML service error in scheduler:', mlError.message);
-                        claimStatus = 'pending'; // fallback
-                    }
-
+                    // 1. Create claim as approved
+                    const claimAmount = 500; // Fixed payout for disruption for demo
                     const claim = new Claim({
                         policyId: policy._id,
                         userId: policy.userId,
                         triggerType,
-                        claimAmount: 500, // Fixed payout for disruption for demo
+                        claimAmount,
                         disruptionDetails: { value: disruptionValue, threshold: disruptionThresholds },
-                        status: claimStatus
+                        status: 'approved'
                     });
                     await claim.save();
-                    console.log(`Automatic claim triggered for user ${policy.userId} due to ${triggerType}. Status: ${claimStatus}`);
+                    console.log(`Automatic claim created and approved for user ${policy.userId} due to ${triggerType}.`);
+
+                    // 2. Add Automatic Payout Logic
+                    const transaction = new Transaction({
+                        userId: policy.userId,
+                        claimId: claim._id,
+                        policyId: policy._id,
+                        type: 'claim_payout', // Using 'claim_payout' as per Transaction schema enum
+                        amount: claimAmount,
+                        status: 'success',
+                        paymentStatus: 'completed'
+                    });
+                    await transaction.save();
+                    console.log(`Payout transaction processed for claim ${claim._id}. Amount distributed: ₹${claimAmount}`);
+
+                    // 3. Update claim status to paid
+                    claim.status = 'paid';
+                    await claim.save();
+                    console.log(`Claim lifecycle completed: Claim ${claim._id} marked as 'paid' instantly.`);
                 }
             }
         }
