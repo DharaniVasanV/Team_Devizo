@@ -90,7 +90,7 @@ const triggerClaim = async (req, res) => {
                     late_delivery_rate:        late_delivery_rate        || 0.05,
                 };
 
-                const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, mlPayload);
+                const mlResponse = await axios.post(`${process.env.ML_API_URL}/fraud-detection`, mlPayload);
 
                 if (mlResponse.data && mlResponse.data.prediction === -1) {
                     claimStatus = 'fraud suspected';
@@ -198,7 +198,7 @@ const simulateFraudClaim = async (req, res) => {
                 cancellation_rate:         0.05,
                 late_delivery_rate:        0.05,
             };
-            const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, mlPayload);
+            const mlResponse = await axios.post(`${process.env.ML_API_URL}/fraud-detection`, mlPayload);
             if (mlResponse.data && mlResponse.data.prediction === -1) {
                 mlStatus = 'fraud suspected';
             }
