@@ -12,7 +12,12 @@ import {
     Zap,
     ThermometerSun,
     Wind,
-    BellRing
+    BellRing,
+    MapPin,
+    FlaskConical,
+    CheckCircle2,
+    XCircle,
+    Loader2
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import AnimatedCharts from '../components/AnimatedCharts';
@@ -23,6 +28,10 @@ const Dashboard = () => {
     const [stats, setStats] = useState({ protected: 0, claimsTriggered: 0, earningsCovered: 0 });
     const [loading, setLoading] = useState(true);
     const dashboardRef = useRef(null);
+
+    // ── Fraud simulation demo state ─────────────────────────────
+    const [fraudLoading, setFraudLoading] = useState(null); // 'GPS_SPOOFING' | 'FAKE_WEATHER' | null
+    const [fraudResult, setFraudResult] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,6 +61,33 @@ const Dashboard = () => {
 
         fetchData();
     }, []);
+
+    // ── Fraud simulation handler ────────────────────────────────
+    const handleFraudSimulation = async (fraudType) => {
+        if (!policy) {
+            setFraudResult({ error: 'You need an active policy first to run the simulation.' });
+            return;
+        }
+        setFraudLoading(fraudType);
+        setFraudResult(null);
+        try {
+            const token = localStorage.getItem('token');
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/claims/simulate-fraud`,
+                { policyId: policy._id, fraudType },
+                config
+            );
+            setFraudResult(res.data);
+            // Refresh claims list
+            const claimsRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/claims`, config);
+            setClaims(claimsRes.data);
+        } catch (err) {
+            setFraudResult({ error: err.response?.data?.message || 'Simulation failed.' });
+        } finally {
+            setFraudLoading(null);
+        }
+    };
 
     useEffect(() => {
         if (!loading) {
@@ -193,9 +229,11 @@ const Dashboard = () => {
                                                 <div className="text-xl font-bold text-green-500 mb-1">+₹{claim.claimAmount}</div>
                                                 <div className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black inline-block ${
                                                     claim.status === 'paid' ? 'bg-green-500/20 text-green-500' : 
-                                                    claim.status === 'approved' ? 'bg-blue-500/20 text-blue-500' : 'bg-yellow-500/20 text-yellow-500'
+                                                    claim.status === 'approved' ? 'bg-blue-500/20 text-blue-500' :
+                                                    claim.status === 'fraud suspected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                                    'bg-yellow-500/20 text-yellow-500'
                                                 }`}>
-                                                    {claim.status}
+                                                    {claim.status === 'fraud suspected' ? '🚨 fraud' : claim.status}
                                                 </div>
                                             </div>
                                         </div>
@@ -212,6 +250,90 @@ const Dashboard = () => {
                         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                             <BellRing className="text-accent" size={24} /> System Alerts
                         </h2>
+
+                        {/* ── Fraud Simulation Demo Panel ─────── */}
+                        <div className="mb-6 p-6 rounded-2xl border border-dashed border-red-500/30 bg-red-500/5">
+                            <div className="flex items-center gap-2 mb-1">
+                                <FlaskConical size={16} className="text-red-400" />
+                                <span className="text-xs font-black uppercase tracking-widest text-red-400">Demo · Fraud Simulator</span>
+                            </div>
+                            <p className="text-slate-500 text-xs mb-4">Trigger a fake claim to see the AI fraud detection in action.</p>
+
+                            <div className="flex flex-col gap-3">
+                                {/* GPS Spoofing Button */}
+                                <motion.button
+                                    id="btn-simulate-gps-fraud"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={() => handleFraudSimulation('GPS_SPOOFING')}
+                                    disabled={!!fraudLoading}
+                                    className="flex items-center gap-3 px-4 py-3 bg-orange-500/10 border border-orange-500/20 rounded-xl text-sm font-bold text-orange-400 hover:bg-orange-500/20 transition-all disabled:opacity-50"
+                                >
+                                    {fraudLoading === 'GPS_SPOOFING'
+                                        ? <Loader2 size={16} className="animate-spin" />
+                                        : <MapPin size={16} />}
+                                    Simulate GPS Spoofing
+                                </motion.button>
+
+                                {/* Fake Weather Button */}
+                                <motion.button
+                                    id="btn-simulate-weather-fraud"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={() => handleFraudSimulation('FAKE_WEATHER')}
+                                    disabled={!!fraudLoading}
+                                    className="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-sm font-bold text-blue-400 hover:bg-blue-500/20 transition-all disabled:opacity-50"
+                                >
+                                    {fraudLoading === 'FAKE_WEATHER'
+                                        ? <Loader2 size={16} className="animate-spin" />
+                                        : <CloudRain size={16} />}
+                                    Simulate Fake Weather Claim
+                                </motion.button>
+                            </div>
+
+                            {/* Result Banner */}
+                            <AnimatePresence>
+                                {fraudResult && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0 }}
+                                        className={`mt-4 p-4 rounded-xl text-xs font-mono leading-relaxed ${
+                                            fraudResult.error
+                                                ? 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-400'
+                                                : fraudResult.fraudSummary?.isFraud
+                                                    ? 'bg-red-500/10 border border-red-500/20 text-red-300'
+                                                    : 'bg-green-500/10 border border-green-500/20 text-green-300'
+                                        }`}
+                                    >
+                                        {fraudResult.error ? (
+                                            <span>⚠️ {fraudResult.error}</span>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-2 mb-2 font-bold text-sm">
+                                                    {fraudResult.fraudSummary?.isFraud
+                                                        ? <><XCircle size={16} className="text-red-400" /> Fraud Detected &amp; Flagged!</>
+                                                        : <><CheckCircle2 size={16} className="text-green-400" /> Claim Appears Legitimate</>}
+                                                </div>
+                                                {fraudResult.fraudSummary?.checks?.map((check, i) => (
+                                                    <div key={i} className="mb-1">
+                                                        <span className="opacity-60">[{check.type}]</span> {check.verdict}
+                                                        {check.reasons?.slice(0, 2).map((r, j) => (
+                                                            <div key={j} className="pl-4 opacity-70">• {r}</div>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                                <div className="mt-2 opacity-50">
+                                                    Ground Truth — Rain: {fraudResult.fraudSummary?.groundTruth?.rainfall?.toFixed(1)}mm |
+                                                    Temp: {fraudResult.fraudSummary?.groundTruth?.temperature?.toFixed(1)}°C |
+                                                    AQI: {fraudResult.fraudSummary?.groundTruth?.aqi?.toFixed(0)}
+                                                </div>
+                                            </>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                         <div className="space-y-4">
                             <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl relative overflow-hidden group">
                                 <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
