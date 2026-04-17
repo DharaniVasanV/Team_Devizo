@@ -134,7 +134,7 @@ const LandingPage = () => {
                     <div className="text-center mb-24 max-w-3xl mx-auto px-4">
                         <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-4 block">Engineered for Reliability</span>
                         <h2 className="text-3xl md:text-6xl font-bold tracking-tight mb-6">Designed for the world's ambitious gig workers.</h2>
-                        <p className="text-lg md:text-xl text-slate-500 leading-relaxed">GigShield handles the complexity of environmental risk so you can focus on your business.</p>
+                        <p className="text-lg md:text-xl text-slate-500 leading-relaxed">PayProtect handles the complexity of environmental risk so you can focus on your business.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
@@ -170,7 +170,7 @@ const LandingPage = () => {
                         <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/10 blur-[120px] rounded-full"></div>
                         <div className="relative z-10 max-w-2xl px-4 md:px-0">
                             <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Ready to join the future of insurance?</h2>
-                            <p className="text-base md:text-lg text-slate-400 mb-0">Join 45,000+ gig workers across 20 cities using GigShield to secure their livelihood.</p>
+                            <p className="text-base md:text-lg text-slate-400 mb-0">Join 45,000+ gig workers across 20 cities using PayProtect to secure their livelihood.</p>
                         </div>
                         <div className="relative z-10 flex w-full md:w-auto shrink-0">
                             <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-10 py-4 rounded-xl text-lg font-bold shadow-xl shadow-blue-600/20 transition-all w-full md:w-auto text-center">
@@ -188,7 +188,7 @@ const LandingPage = () => {
                         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <Shield className="w-4 h-4 text-white" />
                         </div>
-                        <span className="text-xl font-bold text-slate-900">GigShield</span>
+                        <span className="text-xl font-bold text-slate-900">PayProtect</span>
                     </div>
                     <div className="flex gap-10 text-sm font-semibold text-slate-500">
                         <a href="#" className="hover:text-blue-600">Privacy Policy</a>
@@ -196,7 +196,7 @@ const LandingPage = () => {
                         <a href="#" className="hover:text-blue-600">Developer API</a>
                     </div>
                     <div className="text-slate-400 text-xs font-medium uppercase tracking-widest">
-                        © 2026 GigShield Lab • Built for the Gig Economy
+                        © 2026 PayProtect Lab • Built for the Gig Economy
                     </div>
                 </div>
             </footer>

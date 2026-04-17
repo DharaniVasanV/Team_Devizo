@@ -5,7 +5,70 @@ import joblib
 import numpy as np
 import os
 
-app = FastAPI()
+from fastapi.responses import HTMLResponse
+
+app = FastAPI(
+    title="PayProtect AI Engine 🚀",
+    description="AI-powered fraud detection and payout simulation for gig worker insurance",
+    version="1.0.0",
+    docs_url=None,
+    redoc_url=None
+)
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui():
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PayProtect AI Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+    <style>
+        body {{
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }}
+        .topbar {{
+            background-color: #0b1f3a !important; /* PayProtect theme dark blue for header */
+        }}
+        .swagger-ui .info hgroup.main h2 {{
+            color: #2563eb; /* Deeper blue for contrast on white */
+            font-size: 30px;
+            font-weight: bold;
+        }}
+        .swagger-ui .btn.execute {{
+            background-color: #2563eb;
+            color: white;
+            border-radius: 10px;
+            font-weight: bold;
+        }}
+        .swagger-ui .opblock-tag {{
+            color: #16a34a; /* Darker green for contrast on white */
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        .swagger-ui .opblock {{
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Softer shadow for white theme */
+            margin-bottom: 12px;
+        }}
+        .swagger-ui .opblock-summary-method {{
+            border-radius: 8px;
+        }}
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+    <script>
+        SwaggerUIBundle({{
+            url: "{app.openapi_url}",
+            dom_id: '#swagger-ui',
+        }});
+    </script>
+</body>
+</html>
+""")
 
 # Add CORS middleware
 app.add_middleware(
@@ -37,8 +100,11 @@ class RiskData(BaseModel):
     aqi: float
     delivery_hours: float
 
-@app.post("/predict")
-def predict(data: ClaimData):
+@app.post("/fraud-detection", tags=["Fraud Detection 🚨"])
+def fraud_detection(data: ClaimData):
+    """
+    Detects anomalous or suspicious worker behavior using machine learning.
+    """
     try:
         input_data = np.array([[
             data.tasks_completed_per_day,
@@ -63,8 +129,11 @@ def predict(data: ClaimData):
     except Exception as e:
         return {"error": str(e)}
 
-@app.post("/predict-risk")
-def predict_risk(data: RiskData):
+@app.post("/payout-simulation", tags=["Payout Simulation 💰"])
+def payout_simulation(data: RiskData):
+    """
+    Calculates risk level and determines payout amount based on environmental conditions.
+    """
     try:
         # Pass 2 features: rainfall and temperature (assuming these are the 2 the risk_model needs)
         input_data = np.array([[data.rainfall, data.temperature]])
@@ -75,18 +144,18 @@ def predict_risk(data: RiskData):
         
         if risk_score < 0.3:
             risk_level = "low"
-            premium = 100
+            payout = 100
         elif risk_score < 0.7:
             risk_level = "medium"
-            premium = 200
+            payout = 200
         else:
             risk_level = "high"
-            premium = 300
+            payout = 300
             
         return {
             "risk_score": round(risk_score, 3),
             "risk_level": risk_level,
-            "recommended_premium": premium
+            "recommended_payout": payout
         }
     except Exception as e:
         return {"error": str(e)}

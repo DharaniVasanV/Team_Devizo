@@ -9,6 +9,20 @@ const PaymentModal = ({ isOpen, onClose, policyName, premiumAmount, userId, poli
   const payBtnRef = useRef(null);
   const successTextRef = useRef(null);
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePay = async () => {
     // Basic GSAP Button click animation
     if (payBtnRef.current) {
@@ -17,42 +31,104 @@ const PaymentModal = ({ isOpen, onClose, policyName, premiumAmount, userId, poli
     
     setIsProcessing(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/simulate`, {
+      const res = await loadRazorpayScript();
+      if (!res) {
+        alert("Razorpay SDK failed to load. Are you online?");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Create Order
+      const createOrderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, policyId, amount: premiumAmount }),
+        body: JSON.stringify({ amount: premiumAmount }),
       });
       
-      const data = await response.json();
+      const orderData = await createOrderRes.json();
       
-      if (data.success) {
-        setPaymentSuccess(true);
-        
-        // GSAP Success text animation
-        setTimeout(() => {
-          if (successTextRef.current) {
-            gsap.fromTo(successTextRef.current, 
-              { opacity: 0, scale: 0.5, y: 20 }, 
-              { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.7)" }
-            );
-          }
-        }, 100);
-
-        setTimeout(() => {
-          onPaymentSuccess();
-          onClose(); // Close modal
-          
-          // Reset internal state safely after closing
-          setTimeout(() => setPaymentSuccess(false), 300);
-        }, 2500);
-      } else {
-        console.error("Payment failed:", data);
+      if (!orderData.success) {
+        alert("Server error creating order.");
+        setIsProcessing(false);
+        return;
       }
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "PayProtect",
+        description: "Insurance Premium Payment",
+        order_id: orderData.order.id,
+        handler: async function (response) {
+          try {
+            // Verify Payment
+            const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            const verifyData = await verifyRes.json();
+            
+            if (verifyData.success) {
+              setPaymentSuccess(true);
+              
+              // GSAP Success text animation
+              setTimeout(() => {
+                if (successTextRef.current) {
+                  gsap.fromTo(successTextRef.current, 
+                    { opacity: 0, scale: 0.5, y: 20 }, 
+                    { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.7)" }
+                  );
+                }
+              }, 100);
+
+              setTimeout(() => {
+                onPaymentSuccess();
+                onClose(); // Close modal
+                
+                // Reset internal state safely after closing
+                setTimeout(() => setPaymentSuccess(false), 300);
+              }, 2500);
+            } else {
+              alert("Payment verification failed!");
+              setIsProcessing(false);
+            }
+          } catch(err) {
+            console.error("Verification Error:", err);
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: "PayProtect User",
+          email: "user@example.com",
+          contact: "9999999999"
+        },
+        theme: {
+          color: "#10b981" // matches emerald-500
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.on('payment.failed', function (response){
+        console.error(response.error);
+        setIsProcessing(false);
+      });
+      paymentObject.open();
+
     } catch (error) {
       console.error("Payment Error:", error);
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -95,7 +171,7 @@ const PaymentModal = ({ isOpen, onClose, policyName, premiumAmount, userId, poli
                     <div className="flex justify-between items-end">
                       <span className="text-gray-400 font-medium">Total Premium</span>
                       <span className="text-emerald-400 font-black text-3xl">
-                        ${premiumAmount || "0.00"}
+                        ₹{premiumAmount || "0.00"}
                       </span>
                     </div>
                   </div>
@@ -120,7 +196,7 @@ const PaymentModal = ({ isOpen, onClose, policyName, premiumAmount, userId, poli
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Processing...
+                          Process...
                         </div>
                       ) : (
                         "Pay Now"

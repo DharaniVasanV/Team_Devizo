@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log("Mongo URI:", process.env.MONGO_URI);
 
 // Fix for MongoDB DNS Resolution on Windows (Local only)
 if (process.env.NODE_ENV !== 'production' && !process.env.RENDER) {
@@ -26,6 +27,9 @@ app.use('/api/policy', require('./routes/policyRoutes'));
 app.use('/api/claims', require('./routes/claimRoutes'));
 app.use('/api/payout', require('./routes/payoutRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
+app.use('/api/worker', require('./routes/workerRoutes'));
+app.use('/api/weather', require('./routes/weatherRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Database Connection
 connectDB().then(() => {
