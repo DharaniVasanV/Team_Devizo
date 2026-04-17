@@ -64,7 +64,7 @@ const calculateRisk = async (req, res) => {
             });
         }
 
-        const { data } = await axios.post(`${process.env.ML_API_URL}/predict-risk`, envData);
+        const { data } = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
         
         res.json({
             risk_score: data.risk_score,

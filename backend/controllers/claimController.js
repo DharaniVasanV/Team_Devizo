@@ -28,7 +28,7 @@ const triggerClaim = async (req, res) => {
                 delivery_hours: req.body.delivery_hours || 0
             };
 
-            const mlResponse = await axios.post(`${process.env.ML_API_URL}/predict`, mlData);
+            const mlResponse = await axios.post(`${process.env.ML_API_URL}/fraud-detection`, mlData);
             
             if (mlResponse.data && mlResponse.data.prediction === -1) {
                 claimStatus = 'fraud suspected';

@@ -5,7 +5,69 @@ import joblib
 import numpy as np
 import os
 
-app = FastAPI()
+from fastapi.responses import HTMLResponse
+
+app = FastAPI(
+    title="PayProtect AI Engine 🚀",
+    description="AI-powered fraud detection and payout simulation for gig worker insurance",
+    version="1.0.0",
+    docs_url=None,
+    redoc_url=None
+)
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui():
+    return HTMLResponse(f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PayProtect AI Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+    <style>
+        body {{
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Inter', sans-serif;
+        }}
+        .topbar {{
+            background-color: #020617 !important;
+        }}
+        .swagger-ui .info hgroup.main h2 {{
+            color: #38bdf8;
+            font-size: 30px;
+            font-weight: bold;
+        }}
+        .swagger-ui .btn.execute {{
+            background-color: #2563eb;
+            border-radius: 10px;
+            font-weight: bold;
+        }}
+        .swagger-ui .opblock-tag {{
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        .swagger-ui .opblock {{
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            margin-bottom: 12px;
+        }}
+        .swagger-ui .opblock-summary-method {{
+            border-radius: 8px;
+        }}
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+    <script>
+        SwaggerUIBundle({{
+            url: "{app.openapi_url}",
+            dom_id: '#swagger-ui',
+        }});
+    </script>
+</body>
+</html>
+""")
 
 # Add CORS middleware
 app.add_middleware(
@@ -37,8 +99,11 @@ class RiskData(BaseModel):
     aqi: float
     delivery_hours: float
 
-@app.post("/predict")
-def predict(data: ClaimData):
+@app.post("/fraud-detection", tags=["Fraud Detection 🚨"])
+def fraud_detection(data: ClaimData):
+    """
+    Detects anomalous or suspicious worker behavior using machine learning.
+    """
     try:
         input_data = np.array([[
             data.tasks_completed_per_day,
@@ -63,8 +128,11 @@ def predict(data: ClaimData):
     except Exception as e:
         return {"error": str(e)}
 
-@app.post("/predict-risk")
-def predict_risk(data: RiskData):
+@app.post("/payout-simulation", tags=["Payout Simulation 💰"])
+def payout_simulation(data: RiskData):
+    """
+    Calculates risk level and determines payout amount based on environmental conditions.
+    """
     try:
         # Pass 2 features: rainfall and temperature (assuming these are the 2 the risk_model needs)
         input_data = np.array([[data.rainfall, data.temperature]])
