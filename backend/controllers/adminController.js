@@ -88,7 +88,7 @@ const getAdminDashboard = async (req, res) => {
         let recommendedPremium = 200;
 
         try {
-            const { data } = await axios.post(`${process.env.ML_API_URL}/predict-risk`, {
+            const { data } = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, {
                 rainfall: 62,
                 temperature: 37,
                 aqi: 210,
@@ -101,8 +101,8 @@ const getAdminDashboard = async (req, res) => {
             if (data.risk_level) {
                 riskLevel = data.risk_level;
             }
-            if (data.recommended_premium) {
-                recommendedPremium = data.recommended_premium;
+            if (data.recommended_payout) {
+                recommendedPremium = data.recommended_payout;
             }
         } catch (error) {
             console.error('Admin dashboard ML risk fetch failed:', error.message);
