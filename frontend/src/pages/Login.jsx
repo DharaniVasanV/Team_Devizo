@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Phone, Lock, ArrowRight, Home } from 'lucide-react';
@@ -11,8 +11,14 @@ const Login = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, token, user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authLoading && token) {
+            navigate(user?.role === 'admin' ? '/admin/dashboard' : '/dashboard');
+        }
+    }, [token, user, authLoading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

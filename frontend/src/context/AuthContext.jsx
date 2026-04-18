@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }) => {
             const enrichedUser = { ...user, swiggyVerification };
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(enrichedUser));
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setToken(token);
             setUser(enrichedUser);
             return { success: true, swiggyVerification, user: enrichedUser };
@@ -63,6 +64,7 @@ export const AuthProvider = ({ children }) => {
             const enrichedUser = { ...user, swiggyVerification };
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(enrichedUser));
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setToken(token);
             setUser(enrichedUser);
             return { success: true, swiggyVerification, user: enrichedUser };

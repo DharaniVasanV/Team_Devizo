@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Phone, Lock, User, MapPin, Truck, ArrowRight, CheckCircle, XCircle, AlertTriangle, Home } from 'lucide-react';
@@ -15,8 +15,14 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [verificationResult, setVerificationResult] = useState(null);
-    const { register } = useAuth();
+    const { register, token, user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authLoading && token) {
+            navigate(user?.role === 'admin' ? '/admin/dashboard' : '/dashboard');
+        }
+    }, [token, user, authLoading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
