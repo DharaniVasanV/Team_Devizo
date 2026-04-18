@@ -64,6 +64,17 @@ const simulateDisasterPayout = async (req, res) => {
             return res.status(400).json({ message: 'No active policy found to process payout.' });
         }
 
+        // Check for existing claim today to prevent abuse (Moved up as requested)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const existingClaim = await Claim.findOne({
+            policyId: activePolicy._id,
+            createdAt: { $gte: today }
+        });
+        if (existingClaim) {
+            return res.status(400).json({ message: 'A payout has already been processed today.' });
+        }
+
         // 2. Fetch live environmental data from OpenWeatherAPI
         const { getWeatherData } = require('../services/weatherService');
         let envData = await getWeatherData(user);
@@ -82,74 +93,77 @@ const simulateDisasterPayout = async (req, res) => {
         console.log(`Live weather fetched for ${envData.city}`);
         console.log(`Rainfall: ${envData.rainfall} mm, AQI: ${envData.aqi}`);
 
-        // Determine dynamic triggerType
-        let triggerType = 'Normal';
-        if (envData.rainfall > 50) triggerType = 'Heavy Rain';
-        else if (envData.temperature > 40) triggerType = 'Extreme Heat';
-        else if (envData.aqi > 200) triggerType = 'Severe Pollution';
-
         // 3. Call ML API for Parametric Insurance logic
         let risk_level = "low";
-        let recommended_payout = 0; // Fallback mock 0
+        let recommended_payout = 0; 
         
         if (process.env.ML_API_URL) {
-            const mlResponse = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
-            if (mlResponse.data && mlResponse.data.recommended_payout !== undefined) {
-                risk_level = mlResponse.data.risk_level;
-                recommended_payout = mlResponse.data.recommended_payout;
-                console.log(`ML predicted risk: ${risk_level.toUpperCase()}`);
+            try {
+                const mlResponse = await axios.post(`${process.env.ML_API_URL}/payout-simulation`, envData);
+                if (mlResponse.data && mlResponse.data.recommended_payout !== undefined) {
+                    risk_level = mlResponse.data.risk_level;
+                    recommended_payout = mlResponse.data.recommended_payout;
+                    console.log(`ML predicted risk: ${risk_level.toUpperCase()}`);
+                }
+            } catch (mlErr) {
+                console.error("ML service failed.", mlErr.message);
+                // Fallback basic logic if ML service is down
+                if (envData.rainfall > 50 || envData.temperature > 40 || envData.aqi > 200) {
+                     risk_level = "high";
+                     recommended_payout = 2500;
+                }
             }
+        } else {
+             // Fallback basic logic if ML missing
+             if (envData.rainfall > 50 || envData.temperature > 40 || envData.aqi > 200) {
+                  risk_level = "high";
+                  recommended_payout = 2500;
+             }
         }
         
         console.log(`₹${recommended_payout} payout processed`);
 
-        // Check for existing claim today to prevent abuse
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const existingClaim = await Claim.findOne({
-            policyId: activePolicy._id,
-            createdAt: { $gte: today }
-        });
-        if (existingClaim) {
-            return res.status(400).json({ message: 'A payout has already been processed today.' });
-        }
+        // Determine dynamic triggerType safely
+        let triggerType = 'Heavy Rain'; // Safe Enum default
+        if (envData.aqi > 150) triggerType = 'Severe Pollution';
+        if (envData.temperature > 38) triggerType = 'Extreme Heat';
+        if (envData.rainfall > 30) triggerType = 'Heavy Rain';
 
-        // 4. Create Claim (Status: Approved)
+        let isNormal = recommended_payout === 0;
+
+        // 4. Create Claim (Status: rejected if NO risk)
         const claim = new Claim({
             policyId: activePolicy._id,
             userId,
             triggerType,
             claimAmount: recommended_payout,
-            status: 'approved',
+            status: isNormal ? 'rejected' : 'paid',
             disruptionDetails: { risk_level, envData }
         });
         await claim.save();
 
-        // 5. Create Transaction (Status: Success)
+        // 5. Create Transaction (Status: failed if NO risk)
         const transaction = new Transaction({
             userId,
             claimId: claim._id,
             policyId: activePolicy._id,
             type: 'claim_payout',
             amount: recommended_payout,
-            status: 'success',
-            paymentStatus: 'completed'
+            status: isNormal ? 'failed' : 'success',
+            paymentStatus: isNormal ? 'failed' : 'completed'
         });
         await transaction.save();
 
-        // 6. Update Claim to Paid
-        claim.status = 'paid';
-        await claim.save();
-
         return res.status(200).json({
-            message: "Payout processed successfully",
-            payout: recommended_payout,
+            message: isNormal ? "No risk detected in current live weather condition. Rupee 0 will be paid." : "Risk detected. Dynamic calculated payout processed successfully.",
+            payoutAmount: recommended_payout,
+            claimId: claim._id,
             risk_level
         });
 
     } catch (error) {
-        console.error("Payout processing error:", error.message);
-        return res.status(500).json({ message: 'Error processing automated payout flow' });
+        console.error("Payout processing error:", error);
+        return res.status(500).json({ message: 'Error processing automated payout flow', error: error.message });
     }
 };
 

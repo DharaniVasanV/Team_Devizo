@@ -144,7 +144,7 @@ def payout_simulation(data: RiskData):
         
         if risk_score < 0.3:
             risk_level = "low"
-            payout = 100
+            payout = 0
         elif risk_score < 0.7:
             risk_level = "medium"
             payout = 200
