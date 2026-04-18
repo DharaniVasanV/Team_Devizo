@@ -135,8 +135,8 @@ def payout_simulation(data: RiskData):
     Calculates risk level and determines payout amount based on environmental conditions.
     """
     try:
-        # Pass 2 features: rainfall and temperature (assuming these are the 2 the risk_model needs)
-        input_data = np.array([[data.rainfall, data.temperature]])
+        # The risk_model expects ['rainfall_mm', 'AQI']
+        input_data = np.array([[data.rainfall, data.aqi]])
         
         # Get probability of class 1 for risk_score
         probas = risk_model.predict_proba(input_data)[0]
